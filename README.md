@@ -26,7 +26,7 @@ libelle_nsf_3;<br>
 code_nsf_1;<br>
 code_nsf_2;<br>
 code_nsf_3;<br>
-ode_certifinfo;<br>
+code_certifinfo;<br>
 siret;<br>
 numero_formation;<br>
 intitule_formation;<br>
