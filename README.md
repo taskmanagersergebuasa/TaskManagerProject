@@ -1,4 +1,5 @@
 # TaskManagerProject
+liste des colonnes identifées comme cible de comparaison avec simplon
 
 date_extract;<br>
 nom_of;<br>
