@@ -8,6 +8,8 @@ def a_response():
     """
     home maid html response for testing
     construire le body pour chaque elt de l item parsé
+    choisir des valeurs réelles sur un cas pour verifier 
+    la perennite du spider
     """
     html = ""
 
@@ -19,7 +21,7 @@ def a_response():
 
 
     # je compare
-    
+
 def test_parse_item(a_response):
     spider = FormationspiderSpider() 
     parsed_items = list(spider.parse_item(a_response))
