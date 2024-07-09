@@ -15,4 +15,4 @@ class FormationspiderSpider(CrawlSpider):
         #item["domain_id"] = response.xpath('//input[@id="sid"]/@value').get()
         #item["name"] = response.xpath('//div[@id="name"]').get()
         #item["description"] = response.xpath('//div[@id="description"]').get()
-        return item
+        return item()
