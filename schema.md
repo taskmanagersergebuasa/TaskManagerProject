@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title
+simplon formation schema
 ---
 erDiagram
 
