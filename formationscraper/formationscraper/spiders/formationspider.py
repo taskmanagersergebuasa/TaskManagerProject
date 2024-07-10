@@ -8,9 +8,9 @@ class FormationspiderSpider(CrawlSpider):
     allowed_domains = ["simplon.co", "francecompetences.fr"]
     start_urls = ["https://simplon.co/notre-offre-de-formation.html"]
 
-    rules = (Rule(LinkExtractor(allow=r"https://simplon.co/formation/.*/\d+"), callback="parse_item", follow=True),
-             Rule(LinkExtractor(allow=r"https://www.francecompetences.fr/recherche/rncp/\d+"), callback="parse_certif_rncp", follow=True),
-             Rule(LinkExtractor(allow=r"https://www.francecompetences.fr/recherche/rs/\d+"), callback="parse_certif_rs", follow=True),)
+    rules = (Rule(LinkExtractor(allow=r"https://simplon.co/formation/.*/\d+"), callback="parse_item", follow=True),)
+            #  Rule(LinkExtractor(allow=r"https://www.francecompetences.fr/recherche/rncp/\d+"), callback="parse_certif_rncp", follow=True),
+            #  Rule(LinkExtractor(allow=r"https://www.francecompetences.fr/recherche/rs/\d+"), callback="parse_certif_rs", follow=True),)
 
     def parse_item(self, response):
         item = {
@@ -22,28 +22,25 @@ class FormationspiderSpider(CrawlSpider):
 
         links_rncp = response.xpath('//a[contains(@href, "francecompetences.fr/recherche/rncp")]/@href').getall()
         self.logger.debug(f"Found RNCP certification links: {links_rncp}")
+
         links_rs = response.xpath('//a[contains(@href, "francecompetences.fr/recherche/rs")]/@href').getall()
         self.logger.debug(f"Found RS certification links: {links_rs}")
 
-        if links_rncp :
-            for link in links_rncp:
-                yield response.follow(link, callback=self.parse_certif_rncp, meta={'item': item})
-        else:
-            # self.log('Sous-page URL non trouvée sur la page initiale.', level=scrapy.log.WARNING)
-            self.logger.warning('No RNCP links found on the initial page.')
+        # Si aucun lien n'est trouvé, on yield l'item directement
+        if not links_rncp and not links_rs:
+            self.logger.warning('No RNCP or RS links found on the initial page.')
             yield item
+        else:
+            # On suit les liens RNCP et RS
+            for link in links_rncp:
+                yield response.follow(link, callback=self.parse_certif_rncp, meta={'item': item}, dont_filter=True)
 
-        # if links_rs :
-        #     for link in links_rs:
-        #         yield response.follow(link, callback=self.parse_certif_rs, meta={'item': item})
-        # else:
-        #     # self.log('Sous-page URL non trouvée sur la page initiale.', level=scrapy.log.WARNING)
-        #     self.logger.warning('No RS links found on the initial page.')
-        #     # yield item
+            for link in links_rs:
+                yield response.follow(link, callback=self.parse_certif_rs, meta={'item': item}, dont_filter=True)
 
 
     def parse_certif_rncp(self, response):
-        # suivre les liens RNCP et RS (quand ils existent) et récupérer :
+        # suivre les liens RNCP (quand ils existent) et récupérer :
         item = response.meta['item']
         self.logger.debug(f"Processing RNCP certification for {response.url}")
         item.update({
@@ -69,26 +66,26 @@ class FormationspiderSpider(CrawlSpider):
 
         yield item
 
-    # def parse_certif_rs(self, response):
-    # # suivre les liens RNCP et RS (quand ils existent) et récupérer :
-    #     item = response.meta['item']
-    #     self.logger.debug(f"Processing RS certification for {response.url}")
-    #     item.update({
-    #         # numéro RS
-    #         'certif_fp_rs' : response.xpath("//p[@class='tag--fcpt-certification black']/span[@class='tag--fcpt-certification__status font-bold']/text()").get(),
+    def parse_certif_rs(self, response):
+    # suivre les liens RS (quand ils existent) et récupérer :
+        item = response.meta['item']
+        self.logger.debug(f"Processing RS certification for {response.url}")
+        item.update({
+            # numéro RS
+            'certif_fp_rs' : response.xpath("//p[@class='tag--fcpt-certification black']/span[@class='tag--fcpt-certification__status font-bold']/text()").get(),
         
-    #         # le titre de la formation
-    #         'titre_certif_fp_rs' : response.xpath("//h1[@class='title--page--generic']/text()").get(),
+            # le titre de la formation
+            'titre_certif_fp_rs' : response.xpath("//h1[@class='title--page--generic']/text()").get(),
         
-    #         # l'état
-    #         'etat_fp_rs' : response.xpath("//p[@class='tag--fcpt-certification green']/span[@class='tag--fcpt-certification__status font-bold']/text()").get(),
+            # l'état
+            'etat_fp_rs' : response.xpath("//p[@class='tag--fcpt-certification green']/span[@class='tag--fcpt-certification__status font-bold']/text()").get(),
         
-    #         # le(s) code(s) NSF et leur désignation
-    #         'nsf_fp_rs' : response.xpath("//p[contains(text(),'Code(s) NSF')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text() | //p[contains(text(),'Code(s) NSF')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall(),
+            # le(s) code(s) NSF et leur désignation
+            'nsf_fp_rs' : response.xpath("//p[contains(text(),'Code(s) NSF')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text() | //p[contains(text(),'Code(s) NSF')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall(),
         
-    #         # le(s) formacode(s) et leur désignation
-    #         'formacode_fp_rs' : response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text() | //p[contains(text(),'Formacode')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall()
+            # le(s) formacode(s) et leur désignation
+            'formacode_fp_rs' : response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text() | //p[contains(text(),'Formacode')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall()
         
-    #     })
+        })
 
-    #     yield item
+        yield item
