@@ -15,7 +15,7 @@ def a_response():
 
     # le request est l url que je scrappe
     request = Request(url="")
-    # je fournit la reponse avec mon html csutom
+    # je fournit la reponse avec mon html custom
     response = HtmlResponse(url=request.url, body=html, encoding='utf-8', request=request)
     return response
 
@@ -31,6 +31,4 @@ def test_parse_item(a_response):
     assert item['domain_id'] == ''
     assert item['name'] == ''
     assert item['description'] == ''
-
-
     pass
