@@ -4,22 +4,32 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from abc import ABC
 
-
-class FormationscraperItem(scrapy.Item):
-    # define the fields for your item here like:
+class FormationItem(scrapy.Item):
     filiere = scrapy.Field()
     titre_formation = scrapy.Field()
-    # certif_rncp = scrapy.Field()
-    # certif_rs = scrapy.Field()
-    certif_fp_rnpc = scrapy.Field()
-    titre_certif_fp_rncp = scrapy.Field()
-    etat_fp_rncp = scrapy.Field()
-    niveau_fp_rncp = scrapy.Field()
-    nsf_fp_rncp  = scrapy.Field()
-    formacode_fp_rncp = scrapy.Field()
-    certif_fp_rs = scrapy.Field()
-    titre_certif_fp_rs = scrapy.Field()
-    etat_fp_rs = scrapy.Field()
-    nsf_fp_rs = scrapy.Field()
-    formacode_fp_rs = scrapy.Field()
+    sessions = scrapy.Field()
+    id_formation = scrapy.Field()
+    id_certif = scrapy.Field()
+
+class SessionItem(scrapy.Item):
+    location = scrapy.Field()
+    date_debut = scrapy.Field()
+    id_formation = scrapy.Field()
+
+class CertifItemBase(ABC,scrapy.Item):
+    id_certif = scrapy.Field()
+    titre = scrapy.Field()
+    etat = scrapy.Field()
+    nsf_code = scrapy.Field()
+    nsf_name = scrapy.Field()
+    formacode = scrapy.Field()
+    formaname = scrapy.Field()
+
+class RncpItem(CertifItemBase):
+    niveau = scrapy.Field()
+
+class RsItem(CertifItemBase):
+    pass
+
