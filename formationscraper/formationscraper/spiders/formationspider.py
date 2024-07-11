@@ -14,7 +14,6 @@ class FormationspiderSpider(CrawlSpider):
         Rule(LinkExtractor(allow=r"https://www.francecompetences.fr/recherche/rs/\d+"), callback="parse_rs", follow=False),
     )
 
-
     def parse_formation(self, response):
         item_formation = FormationItem()
         item_formation["filiere"] = response.xpath("//li[@class='breadcrumb-item']//a[contains(@href, 'https://simplon.co/formations')]/text()").get()
