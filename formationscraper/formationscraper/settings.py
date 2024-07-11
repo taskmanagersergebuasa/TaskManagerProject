@@ -65,8 +65,8 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   # "formationscraper.pipelines.FormationscraperPipeline": 200,
    "formationscraper.pipelines.CsvPipeline": 300,
+   "formationscraper.pipelines.FormationscraperPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -16,8 +16,8 @@ class FormationspiderSpider(CrawlSpider):
         item = {
         'filiere' : response.xpath("//li[@class='breadcrumb-item']//a[contains(@href, 'https://simplon.co/formations')]/text()").get(),
         'titre_formation' : response.xpath("//h1/text()").get(),
-        'certif_rncp' : response.xpath("//div[@class='smp-box two-column certification']//div[@class='card-text']//a[contains(text(), 'RNCP')]/text()").getall(),
-        'certif_rs' : response.xpath("//div[@class='smp-box two-column certification']//div[@class='card-text']//a[contains(text(), 'RS')]/text()").getall()
+        # 'certif_rncp' : response.xpath("//div[@class='smp-box two-column certification']//div[@class='card-text']//a[contains(text(), 'RNCP')]/text()").getall(),
+        # 'certif_rs' : response.xpath("//div[@class='smp-box two-column certification']//div[@class='card-text']//a[contains(text(), 'RS')]/text()").getall()
         }
 
         links_rncp = response.xpath('//a[contains(@href, "francecompetences.fr/recherche/rncp")]/@href').getall()

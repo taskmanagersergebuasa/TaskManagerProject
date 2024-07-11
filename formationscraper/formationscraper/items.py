@@ -10,8 +10,8 @@ class FormationscraperItem(scrapy.Item):
     # define the fields for your item here like:
     filiere = scrapy.Field()
     titre_formation = scrapy.Field()
-    certif_rncp = scrapy.Field()
-    certif_rs = scrapy.Field()
+    # certif_rncp = scrapy.Field()
+    # certif_rs = scrapy.Field()
     certif_fp_rnpc = scrapy.Field()
     titre_certif_fp_rncp = scrapy.Field()
     etat_fp_rncp = scrapy.Field()
