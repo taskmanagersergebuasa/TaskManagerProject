@@ -9,7 +9,6 @@ from abc import ABC
 class FormationItem(scrapy.Item):
     filiere = scrapy.Field()
     titre_formation = scrapy.Field()
-    sessions = scrapy.Field()
     id_formation = scrapy.Field()
     id_certif = scrapy.Field()
 
