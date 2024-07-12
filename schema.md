@@ -6,15 +6,16 @@ erDiagram
 
   FORMATION {
       id_formation int PK
-      formation_name varchar
-      enrollment_date date
-      status varchar
+      titre_formation varchar
+      filiere varchar
+
   }
 
   CERTIFICATION {
-      id_certification int PK
+      id_certif int PK
       certification_name varchar
-      level varchar
+      niveau varchar
+      etat varchar
   }
 
   NSF {
@@ -36,7 +37,7 @@ erDiagram
 
   FORMATION_CERTIFICATION {
       id_formation int PK, FK
-      id_certification int PK, FK
+      id_certif int PK, FK
   }
 
   FORMATION_NSF {
@@ -50,7 +51,7 @@ erDiagram
   }
 
   CERTIFICATION_CERTIFICATEUR {
-      id_certification int PK, FK
+      id_certif int PK, FK
       Siret int PK, FK
   }
 
@@ -58,7 +59,7 @@ erDiagram
       id_session int PK
       id_formation int 
       date_debut date
-      departement varchar
+      location varchar
   }
 
   FORMATION ||--|{ FORMATION_CERTIFICATION : has
