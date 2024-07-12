@@ -2,11 +2,13 @@
 name = "taskmanagerproject"
 version = "0.1.0"
 description = ""
-authors = ["laetitia <dauchyla@gmail.com>"]
+
+authors = ["Serge Buasa <sergebuasa@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "3.10.12"
+pandas = "^2.2.2"
 Scrapy = "^2.11.2"
 
 
