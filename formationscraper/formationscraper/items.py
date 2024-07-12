@@ -32,6 +32,3 @@ class RncpItem(CertifItemBase):
 class RsItem(CertifItemBase):
     pass
 
-
-    
-    
