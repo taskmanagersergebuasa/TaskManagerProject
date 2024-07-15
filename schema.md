@@ -19,7 +19,7 @@ erDiagram
   }
 
   NSF {
-      NSF_code int PK
+      NSF_code String PK
       NSF_name varchar
   }
 
@@ -60,6 +60,42 @@ erDiagram
       id_formation int 
       date_debut date
       location varchar
+  }
+
+  COMPTE_FORMATION {
+    id_compte_formation int PK
+    date_extract
+    nom_of
+    nom_departement
+    nom_region
+    type_referentiel
+    code_inventaire
+    code_rncp
+    intitule_certification
+    libelle_niveau_sortie_formation
+    code_formacode_1
+    code_formacode_2
+    code_formacode_3
+    code_formacode_4
+    code_formacode_5
+    libelle_code_formacode_principal
+    libelle_nsf_1
+    code_nsf_1
+    code_certifinfo
+    siret
+    nb_action
+    nb_session_active
+    nb_session_a_distance
+    nombre_heures_total_min
+    nombre_heures_total_max
+    nombre_heures_total_mean
+    frais_ttc_tot_min
+    frais_ttc_tot_max
+    frais_ttc_tot_mean
+    code_departement
+    code_region
+    nbaction_nbheures
+    coderegion_export
   }
 
   FORMATION ||--|{ FORMATION_CERTIFICATION : has
