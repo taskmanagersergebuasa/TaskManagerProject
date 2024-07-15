@@ -1,6 +1,8 @@
+import scrapy
+import logging
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
-from ..items import FormationItem, SessionItem, RncpItem, RsItem
+from formationscraper.items import FormationItem, SessionItem, RncpItem, RsItem
 
 class FormationspiderSpider(CrawlSpider):
     name = "formationspider"
@@ -56,6 +58,39 @@ class FormationspiderSpider(CrawlSpider):
         item_rs["formaname"] = response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall()
         yield item_rs
 
+
+class MoncompteformationSpider(scrapy.Spider):
+    name = "moncompteformationspider"
+    allowed_domains = ["www.data.gouv.fr"]
+    start_urls = ["https://www.data.gouv.fr/fr/datasets/moncompteformation-loffre-de-formation/#/information"]
+
+    # def parse_item(self, response):
+    #     item_moncompte = []
+    #     item_moncompte["date_maj"] = response.xpath("//dt[@class][contains(text(), 'Créée le')]/following-sibling::dd/text()").get()
+    #     print(item_moncompte["date_maj"])
+    #     # logging.info(f'Item scraped: {item_moncompte}')
+
+    #     return item_moncompte
+    
+    def parse(self, response):
+        date_maj = response.xpath("//dt[@class][contains(text(), 'Créée le')]/following-sibling::dd/text()").get().strip()
+        if date_maj:
+            print(date_maj)  # Imprimer la date de mise à jour
+        else:
+            print("Date de mise à jour non trouvée")
+
+
+    # name = "moncompteformationspider"
+    # allowed_domains = ["opendata.caissedesdepots.fr"]
+    # start_urls = ["https://opendata.caissedesdepots.fr/explore/dataset/moncompteformation_catalogueformation"]
+
+    # def parse_item(self, response):
+    #     item_moncompte = {}
+    #     item_moncompte["date_maj"] = response.xpath('//div[contains(text(), "Modifié")]/../div[contains(@class, "metadata-value")]/text()').get()
+        
+    #     logging.info(f'Item scraped: {item_moncompte}')
+
+    #     return item_moncompte
 
 
 # import scrapy

@@ -50,32 +50,6 @@ class CsvPipeline:
             self.certif_writer.writerow(item)
 
 
-    # def open_spider(self, spider):
-    #     # Ouverture du fichier en mode écriture
-    #     self.file = open('formation_test.csv', 'w', newline='', encoding='utf-8')
-        
-    #     # Définition des en-têtes
-    #     # fieldnames = ['filiere', 'titre_formation', 'id_certif_fp_rnpc', 'titre_certif_fp_rncp', 'etat_fp_rncp', 'niveau_fp_rncp', 'nsf_code_fp_rncp', 'nsf_name_fp_rncp', 'formacode_code_fp_rncp', 'formacode_name_fp_rncp', 'id_certif_fp_rs', 'titre_certif_fp_rs', 'etat_fp_rs', 'nsf_code_fp_rs', 'nsf_name_fp_rs', 'formacode_code_fp_rs', 'formacode_name_fp_rs' ]
-
-    #     fieldnames = ['filiere', 'titre_formation', 'id_formation', 'id_certif', 'location', 'date_debut', 'id_formation_session', 'id_certif_fp', 'titre', 'etat', 'nsf_code', 'nsf_name', 'formacode', 'formaname', 'niveau' ]
-
-        
-    #     # Création de l'objet writer avec les en-têtes
-    #     self.writer = csv.DictWriter(self.file, fieldnames=fieldnames)
-        
-    #     # Écriture des en-têtes
-    #     self.writer.writeheader()
-
-    # def close_spider(self, spider):
-    #     # Fermeture du fichier
-    #     self.file.close()
-
-    # def process_item(self, item, spider):
-    #     # Écriture des données
-    #     self.writer.writerow(item)
-    #     return item
-
-
 class FormationscraperPipeline:
     def process_item(self, item, spider):
         self.clean_niveau_fp_rncp(item)  # nettoyage du niveau RNCP de francecompetences
