@@ -83,10 +83,33 @@ load_clean_test_rncp()
 
 # transformer url via urlib et urlencode et request dont tu enregistres la reponse dans un json/csv eventuellement DONE
 
+# modalites maj: a l usage une fois max par jour a 12h40 sauf le week end
+# chaque semaine en meme temps que la maj scrapping
+
 # conditions pour declencher ex: si mise a jour effectuée via critere date  A FAIRE
-# recuperer la date extract
-# la stocker en l ecrasant dans un fichier cible
-# la comparer avec 
+
+# file avec last_update_date et bool a true par defaut?
+#si date extract 
+
+# file = le blob storage a envoyer dans un azure blob storage?
+
+# si la date au moment de l execution du fichier est > 12h40 pour ll heure et differente de samedi et  dimanche pour le jour
+# alors je verifie si c est la premiere maj 
+    # si fichier n existe pas lecreer:
+        #  avec compteur == True
+        # avec date xtraction 
+    # sinon 
+    ## et si bool a True == 1ere fois :
+    ## passer bool a false
+
+# recuperer la date extract et l envoyer dans un fichier s il n existe pas le creer
+
+# si bool a False  chaner la date 
+# la stocker en l ecrasant dans un fichier cible avec date et bool indicateur mettreajor
+# la comparer avec date extraction 
+# si date extraction 
+# si date 
+
 # une par jour des 12h40
 
 # affectation des download: ds un dossier en csv/json par date?
