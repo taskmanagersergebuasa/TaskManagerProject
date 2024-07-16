@@ -21,7 +21,7 @@ class CsvPipeline:
         # Définition des en-têtes
         self.formation_headers = ['filiere', 'titre_formation', 'id_formation', 'type_certif', 'id_certif']
         self.session_headers = ['id_formation', 'location', 'date_debut', 'duree']
-        self.certif_headers = ['type_certif', 'id_certif', 'titre', 'etat', 'niveau', 'nsf_code', 'nsf_name', 'formacode', 'formaname', 'certificateur']
+        self.certif_headers = ['type_certif', 'id_certif', 'titre', 'etat', 'niveau', 'nsf_code', 'nsf_name', 'formacode', 'formaname', 'certificateur', 'siret']
 
         # Création des objets writer pour chaque fichier avec les en-têtes correspondantes
         self.formation_writer = csv.DictWriter(self.file_formation, fieldnames=self.formation_headers)
@@ -106,8 +106,8 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         type_certif = adapter.get('type_certif')
         if type_certif :
-            adapter['type_certif'] = list(set([(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(1))
-        for element in type_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]))
+            adapter['type_certif'] = [(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(1))
+        for element in type_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]
         return item
 
 
