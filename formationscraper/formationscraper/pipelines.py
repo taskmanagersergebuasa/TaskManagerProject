@@ -21,7 +21,7 @@ class CsvPipeline:
         # Définition des en-têtes
         self.formation_headers = ['filiere', 'titre_formation', 'id_formation', 'type_certif', 'id_certif']
         self.session_headers = ['id_formation', 'location', 'date_debut', 'duree']
-        self.certif_headers = ['type_certif', 'id_certif', 'titre', 'etat', 'niveau', 'nsf_code', 'nsf_name', 'formacode', 'formaname']
+        self.certif_headers = ['type_certif', 'id_certif', 'titre', 'etat', 'niveau', 'nsf_code', 'nsf_name', 'formacode', 'formaname', 'certificateur']
 
         # Création des objets writer pour chaque fichier avec les en-têtes correspondantes
         self.formation_writer = csv.DictWriter(self.file_formation, fieldnames=self.formation_headers)
@@ -50,7 +50,6 @@ class CsvPipeline:
             self.certif_writer.writerow(item)
 
 
-
 class FormationscraperPipeline:
     def process_item(self, item, spider):
         if isinstance(item, FormationItem):
@@ -65,6 +64,8 @@ class FormationscraperPipeline:
             self.clean_duree(item)
             
         elif isinstance(item, CertifItemBase):
+            self.clean_type_certif_fp(item)
+            self.clean_id_certif_fp(item)
             self.clean_niveau(item)
             self.clean_nsf_code(item)
             self.clean_nsf_name(item)
@@ -73,46 +74,70 @@ class FormationscraperPipeline:
 
         return item
     
+    def clean_type_certif_fp(self, item):
+        adapter = ItemAdapter(item)
+        type_certif = adapter.get('type_certif')
+        if type_certif:
+            adapter['type_certif'] = re.search(r'(RS|RNCP)(\d+)', type_certif).group(1)
+        return item
+    
+    def clean_id_certif_fp(self, item):
+        adapter = ItemAdapter(item)
+        id_certif = adapter.get('id_certif')
+        if id_certif:           
+            adapter['id_certif'] = int(re.search(r'(RS|RNCP)(\d+)', id_certif).group(2))
+        return item
+
+
     def clean_id_formation(self, item):
         adapter = ItemAdapter(item)
         id_formation = adapter.get('id_formation')
-        if id_formation :
-            adapter['id_formation'] = int(re.search(r'(\d+)$', id_formation).group(1))
+        if id_formation:
+            match = re.search(r'(\d+)(?=/|$)', id_formation)
+            if match:
+                adapter['id_formation'] = int(match.group(1))
+            else:
+                adapter['id_formation'] = None
+        else:
+            adapter['id_formation'] = None 
         return item
 
     def clean_type_certif(self, item):
         adapter = ItemAdapter(item)
         type_certif = adapter.get('type_certif')
         if type_certif :
-            adapter['type_certif'] = [(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(1))
-        for element in type_certif if re.search(r'recherche/(rs|rncp)/(\d+)', element)]
+            adapter['type_certif'] = list(set([(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(1))
+        for element in type_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]))
         return item
+
 
     def clean_id_certif(self, item):
         adapter = ItemAdapter(item)
         id_certif = adapter.get('id_certif')
-        if id_certif :
-            adapter['id_certif'] = [int(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2))
-        for element in id_certif if re.search(r'recherche/(rs|rncp)/(\d+)', element)]
+        adapter['id_certif'] = list(set([int(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2))
+        for element in id_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]))
         return item
+        
 
     def clean_location(self, item):
         adapter = ItemAdapter(item)
         location = adapter.get('location')
         if location :          
-            adapter['location'] = [element.strip() for element in location if element != '\n                ']
+            adapter['location'] = [element.strip() for element in location][1::2]
+        return item
 
     def clean_date_debut(self, item):
         adapter = ItemAdapter(item)
         debut = adapter.get('date_debut')
         if debut :          
-            adapter['date_debut'] = [element.strip().replace('Début : ','') for element in debut if element != '\n                ']
+            adapter['date_debut'] = [element.strip().replace('Début : ','') for element in debut][1::2]
+        return item
 
     def clean_duree(self, item):
         adapter = ItemAdapter(item)
         duree = adapter.get('duree')
         if duree :          
-            adapter['duree'] = [element.strip() for element in duree if element != '\n                ']
+            adapter['duree'] = [element.strip() for element in duree][1::2]
         return item
 
     def clean_niveau(self, item):
@@ -126,7 +151,7 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         code = adapter.get('nsf_code')
         if code :          
-            adapter['nsf_code'] = [element.strip().split(' :')[0] for element in code if element != '\n                ']
+            adapter['nsf_code'] = [element.strip().split(' :')[0] for element in code][1::2]
         return item
 
     def clean_nsf_name(self, item):
@@ -137,10 +162,18 @@ class FormationscraperPipeline:
         return item
 
     def clean_formacode(self, item):
-        pass
+        adapter = ItemAdapter(item)
+        code = adapter.get('formacode')
+        if code :          
+            adapter['formacode'] = [element.strip() for element in code][1::2]
+        return item
 
     def clean_formaname(self, item):
-        pass
+        adapter = ItemAdapter(item)
+        name = adapter.get('formaname')
+        if name :          
+            adapter['formaname'] = [element.strip() for element in name][1::2]
+        return item
 
 
 
