@@ -80,7 +80,11 @@ erDiagram
     code_formacode_5
     libelle_code_formacode_principal
     libelle_nsf_1
+    libelle_nsf_2
+    libelle_nsf_3
     code_nsf_1
+    code_nsf_2
+    code_nsf_3
     code_certifinfo
     siret
     nb_action
