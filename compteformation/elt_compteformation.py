@@ -78,38 +78,39 @@ def load_clean_test_rs():
 
 
 #load_clean_compteformation()
-load_clean_test_rs()
-load_clean_test_rncp()
+#load_clean_test_rs()
+#load_clean_test_rncp()
 
-# transformer url via urlib et urlencode et request dont tu enregistres la reponse dans un json/csv eventuellement DONE
 
-# modalites maj: a l usage une fois max par jour a 12h40 sauf le week end
-# chaque semaine en meme temps que la maj scrapping
+#requete pour obtenir dataextract au moment de l execution du fichier il fautl heure o ou pas=> non
+query_params_current_date = {
+    "select": "date_extract",
+    #"where": 'libelle_nsf_1 like "Informatique, traitement de l\'information, réseaux de transmission"',
+    "where": 'code_nsf_1 like "326"',
+    "limit": 1,
+    "offset": 0,
+    "timezone": "UTC",
+    "include_links": "false",
+    "include_app_metas": "false"
+}
 
-# conditions pour declencher ex: si mise a jour effectuée via critere date  A FAIRE
+encoded_query_params_current_date = urlencode(query_params_current_date, quote_via=quote_plus)
+URL_current_date  = f"{base_url}?{encoded_query_params_current_date}"
 
-# file avec last_update_date et bool a true par defaut?
-#si date extract 
+def get_current_date():
+    response = requests.get(URL_current_date)
+    current_date = response.json()
+    current_date = current_date[0]['date_extract']
+    #print(type(current_date))
+    return current_date
 
-# file = le blob storage a envoyer dans un azure blob storage?
+get_current_date()
 
-# si la date au moment de l execution du fichier est > 12h40 pour ll heure et differente de samedi et  dimanche pour le jour
-# alors je verifie si c est la premiere maj 
-    # si fichier n existe pas lecreer:
-        #  avec compteur == True
-        # avec date xtraction 
+#comparaison avec date du fichier 
+#si fichier n existe pas lecreer:
+        # y intiliaser date_last_update
+        # date_last_update = currrent_date
     # sinon 
-    ## et si bool a True == 1ere fois :
-    ## passer bool a false
+# si date_update >= datafile alors go load
+                                  # file avec nelle date   
 
-# recuperer la date extract et l envoyer dans un fichier s il n existe pas le creer
-
-# si bool a False  chaner la date 
-# la stocker en l ecrasant dans un fichier cible avec date et bool indicateur mettreajor
-# la comparer avec date extraction 
-# si date extraction 
-# si date 
-
-# une par jour des 12h40
-
-# affectation des download: ds un dossier en csv/json par date?
