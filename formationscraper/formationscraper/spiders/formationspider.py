@@ -47,6 +47,7 @@ class FormationspiderSpider(CrawlSpider):
         item_rncp["formacode"] = response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text()").getall()
         item_rncp["formaname"] = response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall()
         item_rncp["certificateur"] = response.xpath("//button[contains(text(),'Certificateur')]/following-sibling::div//td[@class='table--fcpt-certification__body__cell']/text()").get()
+        item_rncp["siret"] = response.xpath("//button[contains(text(),'Certificateur')]/following-sibling::div//td[@class='table--fcpt-certification__body__cell text-center']/text()").get()
         yield item_rncp
 
 
@@ -62,4 +63,5 @@ class FormationspiderSpider(CrawlSpider):
         item_rs["formacode"] = response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p/span[@class='list--fcpt-certification--essential--desktop__line__text--highlighted']/text()").getall()
         item_rs["formaname"] = response.xpath("//p[contains(text(),'Formacode')]/following-sibling::div/p[@class='list--fcpt-certification--essential--desktop__line__text__default']/text()").getall()
         item_rs["certificateur"] = response.xpath("//button[contains(text(),'Certificateur')]/following-sibling::div//td[@class='table--fcpt-certification__body__cell']/text()").get()
+        item_rs["siret"] = response.xpath("//button[contains(text(),'Certificateur')]/following-sibling::div//td[@class='table--fcpt-certification__body__cell text-center']/text()").get()
         yield item_rs
