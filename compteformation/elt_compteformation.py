@@ -1,7 +1,7 @@
 from urllib.parse import quote_plus, urlencode
 import pandas as pd
 import requests
-
+import dateparser
 #
 base_url = "https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json"
 query_params_test_rncp = {
@@ -58,7 +58,7 @@ def load_clean_compteformation():
     return df__cf_cleaned
     
 
-def load_clean_test_rncp():
+def load_clean_ex_rncp():
     """_summary_
 
     Returns:
@@ -68,7 +68,7 @@ def load_clean_test_rncp():
     df_cf_test_rncp = pd.read_json(URL_test_rncp).to_csv('compteformation/test_cf_rncp')
     return df_cf_test_rncp
 
-def load_clean_test_rs():
+def load_clean_ex_rs():
     """_summary_
 
     Returns:
@@ -111,26 +111,33 @@ def get_current_date():
     #print(type(current_date)) = str
     return current_date
 
-get_current_date()
-
-#comparaison avec date fichier-tampon
-# (a inserer ds blob container storage avec lien avec la bdd sur server azure) 
-#try :
-    # ouvrir et lire file 
-    # si fichier n existe pas
+#get_current_date()
 
 
-#with open('last_update_file.txt'):
 
 
-            # le creer: ou? quel type? to go where? how?
-            # y initiliaser date_last_update
-            # date_last_update = currrent_date
-        # sinon lire
-    # si date_update >=current_date
-        #alors:
-            # go load, in csv or json? to go where? how?
-            # date_last_update = current_date  
-        # sinon:
-            # ras    
+def update_cf():
+    """
 
+    """  
+    try:
+        with open('last_update_file.txt', 'r+') as date_reader_file:
+             date_buffer = date_reader_file.read()
+             current_date = get_current_date()
+             if dateparser.parse(date_buffer) != dateparser.parse(current_date):
+                 load_clean_ex_rs()
+                 load_clean_ex_rncp()
+                 #load_clean_compteformation
+                 with open('last_update_file.txt', 'w')as date_reader_file2:
+                     date_reader_file2.write(f"{current_date}")                 
+             else:
+                 pass
+                 
+       
+    except FileNotFoundError:
+        with open('last_update_file.txt', 'a') as date_reader_file:
+            last_update = get_current_date()
+            date_reader_file.write(f"{last_update}")
+
+
+update_cf()
