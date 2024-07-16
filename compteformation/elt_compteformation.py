@@ -2,7 +2,7 @@ from urllib.parse import quote_plus, urlencode
 import pandas as pd
 import requests
 
-
+#
 base_url = "https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json"
 query_params_test_rncp = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
@@ -17,6 +17,7 @@ query_params_test_rncp = {
 encoded_query_params_test_rncp = urlencode(query_params_test_rncp, quote_via=quote_plus)
 URL_test_rncp  = f"{base_url}?{encoded_query_params_test_rncp}"
 
+# 
 query_params_test_rs = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
     #"where": 'libelle_nsf_1 like "Informatique, traitement de l\'information, réseaux de transmission"',
@@ -30,6 +31,7 @@ query_params_test_rs = {
 encoded_query_params_test_rs = urlencode(query_params_test_rs, quote_via=quote_plus)
 URL_test_rs  = f"{base_url}?{encoded_query_params_test_rs}"
 
+#affiner avec des criteres proches de simplon(listes codes nfs et formacode)
 query_params = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
     #"where": 'libelle_nsf_1 like "Informatique, traitement de l\'information, réseaux de transmission"',
@@ -82,7 +84,7 @@ def load_clean_test_rs():
 #load_clean_test_rncp()
 
 
-#requete pour obtenir dataextract au moment de l execution du fichier il fautl heure o ou pas=> non
+#requete pour obtenir date_extract au moment de l execution du fichier
 query_params_current_date = {
     "select": "date_extract",
     #"where": 'libelle_nsf_1 like "Informatique, traitement de l\'information, réseaux de transmission"',
@@ -98,19 +100,37 @@ encoded_query_params_current_date = urlencode(query_params_current_date, quote_v
 URL_current_date  = f"{base_url}?{encoded_query_params_current_date}"
 
 def get_current_date():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     response = requests.get(URL_current_date)
     current_date = response.json()
     current_date = current_date[0]['date_extract']
-    #print(type(current_date))
+    #print(type(current_date)) = str
     return current_date
 
 get_current_date()
 
-#comparaison avec date du fichier 
-#si fichier n existe pas lecreer:
-        # y intiliaser date_last_update
-        # date_last_update = currrent_date
-    # sinon 
-# si date_update >= datafile alors go load
-                                  # file avec nelle date   
+#comparaison avec date fichier-tampon
+# (a inserer ds blob container storage avec lien avec la bdd sur server azure) 
+#try :
+    # ouvrir et lire file 
+    # si fichier n existe pas
+
+
+#with open('last_update_file.txt'):
+
+
+            # le creer: ou? quel type? to go where? how?
+            # y initiliaser date_last_update
+            # date_last_update = currrent_date
+        # sinon lire
+    # si date_update >=current_date
+        #alors:
+            # go load, in csv or json? to go where? how?
+            # date_last_update = current_date  
+        # sinon:
+            # ras    
 
