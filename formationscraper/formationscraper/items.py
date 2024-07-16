@@ -28,6 +28,7 @@ class CertifItemBase(ABC,scrapy.Item):
     nsf_name = scrapy.Field()
     formacode = scrapy.Field()
     formaname = scrapy.Field()
+    certificateur = scrapy.Field()
 
 class RncpItem(CertifItemBase):
     niveau = scrapy.Field()
