@@ -6,9 +6,17 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from .items import FormationItem, SessionItem, CertifItemBase
+from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem
 import re
 import csv
+
+
+import os
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
+from scrapy.exceptions import DropItem
+from .models import Formation, Session, Certification, NSF, Forma, engine
+from dotenv import load_dotenv
 
 
 class CsvPipeline:
@@ -49,31 +57,6 @@ class CsvPipeline:
         elif isinstance(item, CertifItemBase):
             self.certif_writer.writerow(item)
 
-
-    # def open_spider(self, spider):
-    #     # Ouverture du fichier en mode écriture
-    #     self.file = open('formation_test.csv', 'w', newline='', encoding='utf-8')
-        
-    #     # Définition des en-têtes
-    #     # fieldnames = ['filiere', 'titre_formation', 'id_certif_fp_rnpc', 'titre_certif_fp_rncp', 'etat_fp_rncp', 'niveau_fp_rncp', 'nsf_code_fp_rncp', 'nsf_name_fp_rncp', 'formacode_code_fp_rncp', 'formacode_name_fp_rncp', 'id_certif_fp_rs', 'titre_certif_fp_rs', 'etat_fp_rs', 'nsf_code_fp_rs', 'nsf_name_fp_rs', 'formacode_code_fp_rs', 'formacode_name_fp_rs' ]
-
-    #     fieldnames = ['filiere', 'titre_formation', 'id_formation', 'id_certif', 'location', 'date_debut', 'id_formation_session', 'id_certif_fp', 'titre', 'etat', 'nsf_code', 'nsf_name', 'formacode', 'formaname', 'niveau' ]
-
-        
-    #     # Création de l'objet writer avec les en-têtes
-    #     self.writer = csv.DictWriter(self.file, fieldnames=fieldnames)
-        
-    #     # Écriture des en-têtes
-    #     self.writer.writeheader()
-
-    # def close_spider(self, spider):
-    #     # Fermeture du fichier
-    #     self.file.close()
-
-    # def process_item(self, item, spider):
-    #     # Écriture des données
-    #     self.writer.writerow(item)
-    #     return item
 
 
 class FormationscraperPipeline:
@@ -121,4 +104,126 @@ class FormationscraperPipeline:
         pass
 
 
-    
+
+load_dotenv()
+
+class SQLAlchemyPipeline(object):
+    def __init__(self):
+        self.Session = sessionmaker(bind=engine, autoflush=False)
+
+    def process_item(self, item, spider):
+        session = self.Session()
+        try:
+            if isinstance(item, FormationItem):
+                self._process_formation_item(item, session)
+            elif isinstance(item, SessionItem):
+                self._process_session_item(item, session)
+            elif isinstance(item, RncpItem):
+                self._process_rncp_item(item, session)
+            elif isinstance(item, RsItem):
+                self._process_rs_item(item, session)
+
+            session.commit()
+        except IntegrityError as e:
+            session.rollback()
+            print(f"Error saving item due to integrity error: {e}")
+            raise DropItem(f"Error saving item due to integrity error: {e}")
+        except Exception as e:
+            session.rollback()
+            print(f"Error processing item: {e}")
+            raise DropItem(f"Error processing item: {e}")
+        finally:
+            session.close()
+
+        return item
+
+    def _process_formation_item(self, item, session):
+        formation = session.query(Formation).filter_by(
+            id_formation=item['id_formation']
+        ).first()
+
+        if not formation:
+            formation = Formation(
+                id_formation=item['id_formation'],
+                titre_formation=item['titre_formation'],
+                filiere=item['filiere']
+            )
+            session.add(formation)
+
+        # Add or update certification association
+        if 'id_certif' in item:
+            certification = session.query(Certification).filter_by(id_certif=item['id_certif']).first()
+            if certification and certification not in formation.certifications:
+                formation.certifications.append(certification)
+        session.add(formation)
+
+    def _process_session_item(self, item, session):
+        session_obj = Session(
+            id_formation=item['id_formation'],
+            location=item['location'],
+            date_debut=item['date_debut']
+        )
+        session.add(session_obj)
+
+    def _process_rncp_item(self, item, session):
+        certification = session.query(Certification).filter_by(id_certif=item['id_certif']).first()
+
+        if not certification:
+            certification = Certification(
+                id_certif=item['id_certif'],
+                certif_name=item['titre'],
+                etat=item['etat'],
+                niveau=item['niveau']
+            )
+            session.add(certification)
+
+        nsf = session.query(NSF).filter_by(nsf_code=item['nsf_code']).first()
+        if not nsf:
+            nsf = NSF(
+                nsf_code=item['nsf_code'],
+                nsf_name=item['nsf_name']
+            )
+            session.add(nsf)
+
+        forma = session.query(Forma).filter_by(forma_code=item['formacode']).first()
+        if not forma:
+            forma = Forma(
+                forma_code=item['formacode'],
+                forma_name=item['formaname']
+            )
+            session.add(forma)
+
+        certification.nsfs.append(nsf)
+        certification.formas.append(forma)
+        session.add(certification)
+
+    def _process_rs_item(self, item, session):
+        certification = session.query(Certification).filter_by(id_certif=item['id_certif']).first()
+
+        if not certification:
+            certification = Certification(
+                id_certif=item['id_certif'],
+                certif_name=item['titre'],
+                etat=item['etat']
+            )
+            session.add(certification)
+
+        nsf = session.query(NSF).filter_by(nsf_code=item['nsf_code']).first()
+        if not nsf:
+            nsf = NSF(
+                nsf_code=item['nsf_code'],
+                nsf_name=item['nsf_name']
+            )
+            session.add(nsf)
+
+        forma = session.query(Forma).filter_by(forma_code=item['formacode']).first()
+        if not forma:
+            forma = Forma(
+                forma_code=item['formacode'],
+                forma_name=item['formaname']
+            )
+            session.add(forma)
+
+        certification.nsfs.append(nsf)
+        certification.formas.append(forma)
+        session.add(certification)
