@@ -80,8 +80,8 @@ def load_clean_ex_rs():
 
 
 #load_clean_compteformation()
-#load_clean_test_rs()
-#load_clean_test_rncp()
+load_clean_ex_rs()
+load_clean_ex_rncp()
 
 
 #requete pour obtenir date_extract au moment de l execution du fichier

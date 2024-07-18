@@ -42,7 +42,7 @@ erDiagram
 
   FORMATION_NSF {
       id_formation int PK, FK
-      NSF_code int PK, FK
+      NSF_code String PK, FK
   }
 
   FORMATION_FORMA {
@@ -69,8 +69,7 @@ erDiagram
     nom_departement
     nom_region
     type_referentiel
-    code_inventaire
-    code_rncp
+    code_certif FK
     intitule_certification
     libelle_niveau_sortie_formation
     code_formacode_1
@@ -99,7 +98,19 @@ erDiagram
     code_departement
     code_region
     nbaction_nbheures
-    coderegion_export
+    coderegion_export int
+  }
+  COMPTEFORMATION_CERTIFICATION {
+    id_compte_formation int PK, FK
+    id_certif int PK, FK
+  }
+  COMPTEFORMATION_NSF {
+    id_compte_formation int PK, FK
+      NSF_code int PK, FK
+  }
+  COMPTEFORMATION_FORMA {
+    id_compte_formation int PK, FK
+    forma_code int PK, FK
   }
 
   FORMATION ||--|{ FORMATION_CERTIFICATION : has
@@ -111,3 +122,9 @@ erDiagram
   FORMATION_NSF ||--|{ NSF : has
   FORMATION_FORMA ||--|{ FORMA : has
   CERTIFICATION_CERTIFICATEUR ||--|{ CERTIFICATEUR : has
+  COMPTEFORMATION ||--|{ COMPTEFORMATION_CERTIFICATION : has
+  COMPTEFORMATION ||--|{ COMPTEFORMATION_NSF : has
+  COMPTEFORMATION ||--|{ COMPTEFORMATION_FORMA : has
+  COMPTEFORMATION_CERTIFICATION||--|{ CERTIFICATION : has
+  COMPTEFORMATION_NSF ||--|{ NSF : has
+  COMPTEFORMATION_FORMA ||--|{ FORMA : has
