@@ -106,7 +106,7 @@ erDiagram
   }
   COMPTEFORMATION_NSF {
     id_compte_formation int PK, FK
-      NSF_code int PK, FK
+      NSF_code String PK, FK
   }
   COMPTEFORMATION_FORMA {
     id_compte_formation int PK, FK
