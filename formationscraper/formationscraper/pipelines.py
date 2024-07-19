@@ -210,7 +210,6 @@ load_dotenv()
 
 class SQLAlchemyPipeline(object):
     def __init__(self):
-        # Charger la configuration de la base de données à partir de l'environnement
         load_dotenv()
         if bool(int(os.getenv("IS_POSTGRES"))):
             username = os.getenv("DB_USERNAME")
@@ -222,7 +221,6 @@ class SQLAlchemyPipeline(object):
         else:
             self.bdd_path = 'sqlite:///database.db'
         
-        # Créer le moteur SQLAlchemy et initialiser la session
         self.engine = create_engine(self.bdd_path)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
@@ -250,6 +248,16 @@ class SQLAlchemyPipeline(object):
             filiere=item.get("filiere"),
             id_formation=item.get("id_formation")
         )
+
+        # for certif_id,type_certif in zip(item['id_certif'],item['type_certif']):
+        #     certification = self.session.query(Certification).filter_by(certif_id=certif_id, type_certif=type_certif).first()
+        #     if certification:
+        #         formation.certifications.append(certification)
+        #     else:
+        #         new_certification = Certification(id=certif_id)#, titre="Unknown Title")
+        #         formation.certifications.append(new_certification)
+        #         self.session.add(new_certification)
+
         self.session.merge(formation)
         self.session.commit()
 
@@ -266,6 +274,7 @@ class SQLAlchemyPipeline(object):
     def save_rncp(self, item):
         rncp = Certification(
             id_certif=item.get("id_certif"),
+            type_certif=item.get("type_certif"),
             certif_name=item.get("titre"),
             niveau=item.get("niveau"),
             etat=item.get("etat")
@@ -276,6 +285,7 @@ class SQLAlchemyPipeline(object):
     def save_rs(self, item):
         rs = Certification(
             id_certif=item.get("id_certif"),
+            type_certif=item.get("type_certif"),
             certif_name=item.get("titre"),
             etat=item.get("etat")
         )
@@ -308,3 +318,4 @@ class SQLAlchemyPipeline(object):
 
     def close_spider(self, spider):
         self.session.close()
+

@@ -48,33 +48,43 @@ formation_certification = Table(
     Base.metadata,
     Column('id_formation', Integer, ForeignKey('formation.id_formation')),
     Column('id_certif', String, ForeignKey('certification.id_certif')),
-    PrimaryKeyConstraint('id_formation', 'id_certif')
+    Column('type_certif', String, ForeignKey('certification.type_certif')),
+    PrimaryKeyConstraint('id_formation','id_certif','type_certif'),
+    # ForeignKeyConstraint(['id_certif', 'type_certif'], ['certification.id_certif', 'certification.type_certif'])
 )
 
 certification_certificateur = Table(
     'certification_certificateur',
     Base.metadata,
     Column('id_certif', String, ForeignKey('certification.id_certif')),
+    Column('type_certif', String, ForeignKey('certification.type_certif')),
     Column('siret', String, ForeignKey('certificateur.siret')),
-    PrimaryKeyConstraint('id_certif', 'siret')
+    PrimaryKeyConstraint('id_certif','type_certif','siret')
 )
 
 # Définir les classes
 class Formation(Base):
     __tablename__ = 'formation'
-    id_formation = Column(Integer, primary_key=True, autoincrement=True)
+    id_formation = Column(Integer, primary_key=True)
     titre_formation = Column(String)
     filiere = Column(String)
     certifications = relationship('Certification',
                                   secondary=formation_certification,
-                                  back_populates='formations')
+                                  foreign_keys=[formation_certification.c.id_formation],
+                                  primaryjoin="Formation.id_formation == formation_certification.c.id_formation",
+                                  secondaryjoin="and_(formation_certification.c.id_certif == Certification.id_certif, "
+                                                 "formation_certification.c.type_certif == Certification.type_certif)",
+                                  back_populates='formations',
+                                )                            
     nsfs = relationship('NSF',
                         secondary=formation_nsf,
+                        primaryjoin="NSF.nsf_code == formation_nsf.c.nsf_code",
+                        secondaryjoin = "formation_nsf.c.id_formation == Formation.id_formation",
                         back_populates='formations')
     formas = relationship('Forma',
                           secondary=formation_forma,
                           back_populates='formations')
-    sessions = relationship("Session", back_populates="formation")
+    sessions = relationship("Session", back_populates="formations")
 
 class Session(Base):
     __tablename__ = 'session'
@@ -88,6 +98,7 @@ class Session(Base):
 class Certification(Base):
     __tablename__ = 'certification'
     id_certif = Column(String, primary_key=True)
+    type_certif = Column(String, primary_key=True)
     certif_name = Column(String)
     niveau = Column(String)
     etat = Column(Integer)
@@ -96,6 +107,7 @@ class Certification(Base):
                                   back_populates='certifications')
     formations = relationship('Formation',
                               secondary=formation_certification,
+                              foreign_keys=[formation_certification.c.id_certif, formation_certification.c.type_certif],
                               back_populates='certifications')
 
 class Certificateur(Base):
@@ -124,3 +136,5 @@ class Forma(Base):
 
 engine = create_engine(bdd_path)
 Base.metadata.create_all(engine)
+
+
