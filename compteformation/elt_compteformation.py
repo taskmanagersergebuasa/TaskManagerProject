@@ -4,6 +4,22 @@ import requests
 import dateparser
 
 
+### CLEAN DATAFRAME (id_certif)
+
+def clean_codecertif_cf(df: pd.DataFrame):
+    """
+    
+    """
+    print(df.info())
+    for i in range(len(df['code_inventaire'].values.tolist())):
+         if df.loc[i, 'type_referentiel'] == 'RS':
+                                              df.loc[i, 'code_rncp'] = df.loc[i, 'code_inventaire']
+    del df['code_inventaire']
+    df = df.rename(columns={'code_rncp': 'id_certif'})
+    print(df.info())
+    return df                  
+
+
 ### EXEMPLES RNCP & RS(100 lignes)####################################
 #
 base_url = "https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json"
@@ -27,7 +43,9 @@ def load_clean_ex_rncp():
         _type_: _description_
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
-    df_cf_test_rncp = pd.read_json(URL_test_rncp).to_csv('compteformation/test_cf_rncp')
+    df_cf_test_rncp = pd.read_json(URL_test_rncp)
+    df_cf_test_rncp = clean_codecertif_cf(df_cf_test_rncp)
+    load_cf_test_rncp = df_cf_test_rncp.to_csv('compteformation/test_cf_rncp')
     return df_cf_test_rncp
 
 # 
@@ -51,11 +69,14 @@ def load_clean_ex_rs():
         _type_: _description_
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
-    df_cf_test_rs = pd.read_json(URL_test_rs).to_csv('compteformation/test_cf_rs')
+    df_cf_test_rs = pd.read_json(URL_test_rs)
+    df_cf_test_rs = clean_codecertif_cf(df_cf_test_rs)
+    load_cf_test_rs = df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     return df_cf_test_rs
 #
-load_clean_ex_rs()
 load_clean_ex_rncp()
+load_clean_ex_rs()
+
 
 ### LOAD COMPTE FORMATION ###########################################
 
@@ -83,14 +104,12 @@ def load_compteformation():
         _type_: _description_
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=-1&timezone=UTC&use_labels=false&epsg=4326'
-    df__cf_origin = pd.read_json(URL)
-    return df__cf_origin
+    df_cf_origin = pd.read_json(URL)
+    df_cf = clean_codecertif_cf(df_cf_origin)
+    return df_cf
 
-# df_cf_cleaned  == df_cf 
-def clean_codecertif_cf():
-     df_clean_rs = load_clean_ex_rs()
 
-     pass
+     
 
 
 #load_compteformation()
@@ -150,7 +169,7 @@ def update_cf():
             date_reader_file.write(f"{last_update}")
 
 
-update_cf()
+#update_cf()
 
 ### PROCESSING COMPTEFORMATION
 
