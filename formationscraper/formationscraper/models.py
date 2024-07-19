@@ -1,4 +1,3 @@
-# models.py
 from sqlalchemy import create_engine, Column, String, Integer, Float, Date, ForeignKey, Table, PrimaryKeyConstraint, ForeignKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -83,6 +82,7 @@ class Session(Base):
     id_formation = Column(Integer, ForeignKey('formation.id_formation')) 
     formation = relationship("Formation", back_populates="sessions")
     location = Column(String)
+    duree = Column(Integer)
     date_debut = Column(date_type)
 
 class Certification(Base):
@@ -108,7 +108,7 @@ class Certificateur(Base):
 
 class NSF(Base):
     __tablename__ = 'nsf'
-    nsf_code = Column(Integer, primary_key=True)
+    nsf_code = Column(String, primary_key=True)
     nsf_name = Column(String)
     formations = relationship('Formation',
                               secondary=formation_nsf,
