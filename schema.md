@@ -62,14 +62,14 @@ erDiagram
       location varchar
   }
 
-  COMPTE_FORMATION {
+  COMPTE_FORMATION_ORIGINE {
     id_compte_formation int PK
     date_extract
     nom_of
     nom_departement
     nom_region
     type_referentiel
-    code_certif FK
+    id_certif FK
     intitule_certification
     libelle_niveau_sortie_formation
     code_formacode_1
@@ -99,6 +99,12 @@ erDiagram
     code_region
     nbaction_nbheures
     coderegion_export int
+  }
+
+  COMPTE_FORMATION {
+
+
+    id_compte_formation int
   }
   COMPTEFORMATION_CERTIFICATION {
     id_compte_formation int PK, FK
