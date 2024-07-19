@@ -1,7 +1,6 @@
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from ..items import FormationItem, SessionItem, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
-import scrapy
 
 class FormationspiderSpider(CrawlSpider):
     name = "formationspider"
