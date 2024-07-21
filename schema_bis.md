@@ -7,16 +7,19 @@ erDiagram
   FORMATION {
       id_formation int PK
       titre_formation varchar
-      filiere varchar
-
+      intitule_certification varchar
+      nom_of varchar
+      id_certif varchar   
+            
   }
 
-  CERTIFICATION {
-      id_certif varchar PK
+   CERTIFICATION {
+      id_certif int PK
       certification_name varchar
       niveau varchar
-      etat int
+      etat varchar
   }
+
 
   NSF {
       NSF_code int PK
@@ -29,14 +32,15 @@ erDiagram
   }
 
   CERTIFICATEUR {
-      siret string PK
+      siret int PK
       legal_name varchar
-      
+      Commercial_name varchar
+      internet_site varchar
   }
 
   FORMATION_CERTIFICATION {
       id_formation int PK, FK
-      id_certif string PK, FK
+      id_certif int PK, FK
   }
 
   FORMATION_NSF {
@@ -50,8 +54,8 @@ erDiagram
   }
 
   CERTIFICATION_CERTIFICATEUR {
-      id_certif string PK, FK
-      siret string PK, FK
+      id_certif int PK, FK
+      siret int PK, FK
   }
 
   SESSION {
@@ -59,11 +63,10 @@ erDiagram
       id_formation int FK
       date_debut date
       location varchar
-      duree int
   }
 
   COMPTE_FORMATION_ORIGINE {
-    id_compte_formation int PK
+    id_formation int PK
     date_extract date
     nom_of varchar
     nom_departement varchar
@@ -97,30 +100,11 @@ erDiagram
     frais_ttc_tot_mean int
     code_departement int
     code_region int
-    nbaction_nbheures int    
+    nbaction_nbheures int
     coderegion_export int
   }
 
-  COMPTEFORMATION {
-    id_compte_formation int PK, FK
-    nom_of varchar
-    inititule_certification varchar
-    id_certif varchar 
-
-  }
-  COMPTEFORMATION_CERTIFICATION {
-    id_compte_formation int PK, FK
-    id_certif int PK, FK
-  }
-  COMPTEFORMATION_NSF {
-    id_compte_formation int PK, FK
-    NSF_code int PK, FK
-  }
-  COMPTEFORMATION_FORMA {
-    id_compte_formation int PK, FK
-    forma_code int PK, FK
-  }
-
+  
   FORMATION ||--|{ FORMATION_CERTIFICATION : has
   FORMATION ||--|{ FORMATION_NSF : has
   FORMATION ||--|{ FORMATION_FORMA : has
@@ -130,9 +114,4 @@ erDiagram
   FORMATION_NSF ||--|{ NSF : has
   FORMATION_FORMA ||--|{ FORMA : has
   CERTIFICATION_CERTIFICATEUR ||--|{ CERTIFICATEUR : has
-  COMPTEFORMATION ||--|{ COMPTEFORMATION_CERTIFICATION : has
-  COMPTEFORMATION ||--|{ COMPTEFORMATION_NSF : has
-  COMPTEFORMATION ||--|{ COMPTEFORMATION_FORMA : has
-  COMPTEFORMATION_CERTIFICATION||--|{ CERTIFICATION : has
-  COMPTEFORMATION_NSF ||--|{ NSF : has
-  COMPTEFORMATION_FORMA ||--|{ FORMA : has
+  
