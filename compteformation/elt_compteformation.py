@@ -10,13 +10,11 @@ def clean_codecertif_cf(df: pd.DataFrame):
     """
     
     """
-    print(df.info())
     for i in range(len(df['code_inventaire'].values.tolist())):
          if df.loc[i, 'type_referentiel'] == 'RS':
                                               df.loc[i, 'code_rncp'] = df.loc[i, 'code_inventaire']
     del df['code_inventaire']
     df = df.rename(columns={'code_rncp': 'id_certif'})
-    print(df.info())
     return df  
 
 def add_idcompteformation(df: pd.DataFrame):
@@ -25,13 +23,11 @@ def add_idcompteformation(df: pd.DataFrame):
     """
     df.insert(0, 'id_compte_formation', range(0, len(df)))
     df.set_index(keys=['id_compte_formation'], inplace=True)
-    print(df.info())
-    print(df.index)
     return df
                       
 
 
-### EXEMPLES RNCP & RS(100 lignes)####################################
+### EXEMPLES RNCP & RS 100 lignes en exemple####################################
 #
 base_url = "https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json"
 query_params_test_rncp = {
@@ -57,6 +53,8 @@ def load_clean_ex_rncp():
     df_cf_test_rncp = pd.read_json(URL_test_rncp)
     df_cf_test_rncp = clean_codecertif_cf(df_cf_test_rncp)
     df_cf_test_rncp = add_idcompteformation(df_cf_test_rncp)
+    print(df_cf_test_rncp.info())
+    print(df_cf_test_rncp.index)
     load_cf_test_rncp = df_cf_test_rncp.to_csv('compteformation/test_cf_rncp')
     return df_cf_test_rncp
 
@@ -84,6 +82,8 @@ def load_clean_ex_rs():
     df_cf_test_rs = pd.read_json(URL_test_rs)
     df_cf_test_rs = clean_codecertif_cf(df_cf_test_rs)
     df_cf_test_rs = add_idcompteformation(df_cf_test_rs)
+    print(df_cf_test_rs.info())
+    print(df_cf_test_rs.index)
     load_cf_test_rs = df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     return df_cf_test_rs
 #
@@ -91,7 +91,7 @@ load_clean_ex_rncp()
 load_clean_ex_rs()
 
 
-### LOAD COMPTE FORMATION ###########################################
+### LOAD COMPTE FORMATION -60000 lignes! ###########################################
 
 
 #affiner avec des criteres proches de simplon(listes codes nfs et formacode)
@@ -186,8 +186,13 @@ def update_cf():
 #update_cf()
 
 ### PROCESSING COMPTEFORMATION
+#creation des dataframes from load
 
 ## INGESTION EN BDD DIRECTEMENT, MODELS 
+#to sql des dataframes?
+#ingestion via with open(csv_file_path, newline='', encoding='ISO-8859-1') as csvfile:
+        #csvreader =  csv.DictReader(csvfile, delimiter=';', quotechar='"', escapechar='\\')
+        #for row in csvreader:  ?
 
 
 
