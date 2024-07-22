@@ -214,7 +214,7 @@ def update_cf():
 #creation des dataframes a partir de la source compte formation nettoyée et mise a jour
 df_source = update_cf()
 #df_compte_formation
-
+df_compte_formation = df_source['id_compte_formation'] + ['']
 
 #df_nfs
 
