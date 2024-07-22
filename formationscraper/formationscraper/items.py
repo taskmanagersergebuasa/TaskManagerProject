@@ -24,12 +24,9 @@ class CertifItemBase(ABC,scrapy.Item):
     id_certif = scrapy.Field()
     titre = scrapy.Field()
     etat = scrapy.Field()
-    nsf_code = scrapy.Field()
-    nsf_name = scrapy.Field()
-    formacode = scrapy.Field()
-    formaname = scrapy.Field()
+    nsf = scrapy.Field()
+    forma = scrapy.Field()
     certificateur = scrapy.Field()
-    siret = scrapy.Field()
 
 class RncpItem(CertifItemBase):
     niveau = scrapy.Field()
@@ -37,3 +34,20 @@ class RncpItem(CertifItemBase):
 class RsItem(CertifItemBase):
     pass
 
+class CodeItem(ABC,scrapy.Item):
+    code = scrapy.Field()
+    name = scrapy.Field()
+    type_certif = scrapy.Field()
+    id_certif = scrapy.Field()
+
+class NsfItem(CodeItem):
+    pass
+
+class FormaItem(CodeItem):
+    pass
+
+class CertificateurItem(scrapy.Item):
+    siret = scrapy.Field()
+    certificateur_name = scrapy.Field()
+    type_certif = scrapy.Field()
+    id_certif = scrapy.Field()
