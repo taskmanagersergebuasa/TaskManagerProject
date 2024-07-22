@@ -42,14 +42,16 @@ erDiagram
       type_certif string PK, FK
   }
 
-  FORMATION_NSF {
-      id_formation int PK, FK
+  CERTIFICATION_NSF {
+      id_certif varchar PK, FK
+      type_certif varchar PK,FK
       NSF_code int PK, FK
   }
 
-  FORMATION_FORMA {
-      id_formation int PK, FK
-      forma_code int PK, FK
+  CERTIFICATION_FORMA {
+    id_certif varchar PK, FK
+    type_certif varchar PK,FK
+    forma_code int PK, FK
   }
 
   CERTIFICATION_CERTIFICATEUR {
@@ -126,13 +128,13 @@ erDiagram
   }
 
   FORMATION ||--|{ FORMATION_CERTIFICATION : has
-  FORMATION ||--|{ FORMATION_NSF : has
-  FORMATION ||--|{ FORMATION_FORMA : has
-  FORMATION ||--|{ SESSION : has
-  CERTIFICATION ||--|{ CERTIFICATION_CERTIFICATEUR : has
   FORMATION_CERTIFICATION ||--|{ CERTIFICATION : has
-  FORMATION_NSF ||--|{ NSF : has
-  FORMATION_FORMA ||--|{ FORMA : has
+  NSF ||--|{ CERTIFICATION_NSF : has
+  FORMA ||--|{ CERTIFICATION_FORMA : has
+  CERTIFICATION_NSF ||--|{ CERTIFICATION: has
+  CERTIFICATION_FORMA ||--|{ CERTIFICATION: has
+  FORMATION ||--|{ SESSION : has
+  CERTIFICATION ||--|{ CERTIFICATION_CERTIFICATEUR : has 
   CERTIFICATION_CERTIFICATEUR ||--|{ CERTIFICATEUR : has
   COMPTEFORMATION ||--|{ COMPTEFORMATION_CERTIFICATION : has
   COMPTEFORMATION ||--|{ COMPTEFORMATION_NSF : has
