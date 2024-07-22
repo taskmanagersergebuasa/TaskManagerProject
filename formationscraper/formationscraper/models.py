@@ -27,20 +27,30 @@ else:
     
 
 # Définir les tables d'association en premier
-formation_forma = Table(
-    'formation_forma',
+certification_forma = Table(
+    'certification_forma',
     Base.metadata,
-    Column('id_formation', ForeignKey('formation.id_formation')),
-    Column('formacode', ForeignKey('forma.forma_code')),
-    PrimaryKeyConstraint('id_formation', 'formacode')
+    Column('id_certif'),
+    Column('type_certif'),
+    Column('forma_code', ForeignKey('forma.forma_code')),
+    PrimaryKeyConstraint('forma_code', 'id_certif', 'type_certif'),
+    ForeignKeyConstraint(
+        ['id_certif', 'type_certif'],
+        ['certification.id_certif', 'certification.type_certif']
+    )
 )
 
-formation_nsf = Table(
-    'formation_nsf',
+certification_nsf = Table(
+    'certification_nsf',
     Base.metadata,
-    Column('id_formation', ForeignKey('formation.id_formation')),
+    Column('id_certif'),
+    Column('type_certif'),
     Column('nsf_code', ForeignKey('nsf.nsf_code')),
-    PrimaryKeyConstraint('id_formation', 'nsf_code')
+    PrimaryKeyConstraint('nsf_code', 'id_certif', 'type_certif'),
+    ForeignKeyConstraint(
+        ['id_certif', 'type_certif'],
+        ['certification.id_certif', 'certification.type_certif']
+    )
 )
 
 formation_certification = Table(
@@ -78,16 +88,7 @@ class Formation(Base):
     filiere = Column(String)
     certifications = relationship('Certification',
                                   secondary=formation_certification,
-                                #   primaryjoin="Formation.id_formation == formation_certification.c.id_formation",
-                                #   secondaryjoin="and_(formation_certification.c.id_certif == Certification.id_certif, "
-                                #                  "formation_certification.c.type_certif == Certification.type_certif)",
                                   back_populates='formations')
-    nsfs = relationship('NSF',
-                        secondary=formation_nsf,
-                        back_populates='formations')
-    formas = relationship('Forma',
-                          secondary=formation_forma,
-                          back_populates='formations')
     sessions = relationship("Session", back_populates="formation")
 
 class Session(Base):
@@ -101,7 +102,7 @@ class Session(Base):
 
 class Certification(Base):
     __tablename__ = 'certification'
-    id_certif = Column(Integer, primary_key=True)
+    id_certif = Column(String, primary_key=True)
     type_certif = Column(String, primary_key=True)
     certif_name = Column(String)
     niveau = Column(Integer)
@@ -112,7 +113,12 @@ class Certification(Base):
     formations = relationship('Formation',
                               secondary=formation_certification,
                               back_populates='certifications')
-    # __table_args__ = []
+    nsfs = relationship('NSF',
+                        secondary=certification_nsf,
+                        back_populates='certifications')
+    formas = relationship('Forma',
+                          secondary=certification_forma,
+                          back_populates='certifications')
 
 class Certificateur(Base):
     __tablename__ = 'certificateur'
@@ -126,16 +132,16 @@ class NSF(Base):
     __tablename__ = 'nsf'
     nsf_code = Column(String, primary_key=True)
     nsf_name = Column(String)
-    formations = relationship('Formation',
-                              secondary=formation_nsf,
+    certifications = relationship('Certification',
+                              secondary=certification_nsf,
                               back_populates='nsfs')
 
 class Forma(Base):
     __tablename__ = 'forma'
     forma_code = Column(Integer, primary_key=True)
     forma_name = Column(String)
-    formations = relationship('Formation',
-                              secondary=formation_forma,
+    certifications = relationship('Certification',
+                              secondary=certification_forma,
                               back_populates='formas')
 
 engine = create_engine(bdd_path)
