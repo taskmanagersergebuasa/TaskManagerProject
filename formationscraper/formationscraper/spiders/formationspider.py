@@ -80,7 +80,7 @@ class FormationspiderSpider(CrawlSpider):
         item_certif["type_certif"] = response.xpath("//p[@class='tag--fcpt-certification black']/span[@class='tag--fcpt-certification__status font-bold']/text()").get()
         item_certif["id_certif"] = response.xpath("//p[@class='tag--fcpt-certification black']/span[@class='tag--fcpt-certification__status font-bold']/text()").get()
         item_certif["titre"] = response.xpath("//h1[@class='title--page--generic']/text()").get()
-        item_certif["etat"] = response.xpath("//p[@class='tag--fcpt-certification green']/span[@class='tag--fcpt-certification__status font-bold']/text()").get()
+        item_certif["etat"] = response.xpath("//span[text()='Etat :']/following-sibling::span[@class='tag--fcpt-certification__status font-bold']/text()").get()
         yield item_certif
         yield from self.parse_nsf(response, item_certif)
         yield from self.parse_forma(response, item_certif)
