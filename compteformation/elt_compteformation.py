@@ -20,15 +20,6 @@ def clean_idcertif_cf(df: pd.DataFrame):
     df['id_certif'] = df['id_certif'].astype(str)
     return df  
 
-#"ajout" de val de type_referentiel a valeurs de colonne id_certif 
-#def clean_idcertif_cf(df: pd.DataFrame):
-    """
-
-    """
-    df['id_certif'] = df['id_certif'].astype(str)
-    df['id_certif'] = df['type_referentiel'] + df['id_certif']
-    del df['type_referentiel']
-    return df
 #modif nom type_referentiel en type_certif
 def clean_typecertif_cf(df: pd.DataFrame):
         df = df.rename(columns={'type_referentiel': 'type_certif'})
@@ -108,8 +99,8 @@ def load_clean_ex_rs():
     load_cf_test_rs = df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     return df_cf_test_rs
 #
-#load_clean_ex_rncp()
-#load_clean_ex_rs()
+load_clean_ex_rncp()
+load_clean_ex_rs()
 
 
 ### LOAD COMPTE FORMATION -60000 lignes! ###########################################
@@ -211,28 +202,7 @@ def update_cf():
 #update_cf()
 
 ### PROCESSING COMPTEFORMATION
-#creation des dataframes a partir de la source compte formation nettoyée et mise a jour
-df_source = update_cf()
-#df_compte_formation
-df_compte_formation = df_source['id_compte_formation'] + ['']
 
-#df_nfs
-
-#df_formacode
-
-#df_cf_nfs
-
-#df_cf_formacode
-
-#df_cf_certification
-
-#df_certification_certificateur
-
-#df_certificateur
-
-## INGESTION EN BDD DIRECTEMENT, MODELS 
-#suppression de la source compteformationorigine à l etape des models?
-#to sql des dataframes?
 
 
 
