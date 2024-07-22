@@ -74,6 +74,7 @@ class FormationscraperPipeline:
             self.clean_type_certif_fp(item)
             self.clean_id_certif_fp(item)
             self.clean_niveau(item)
+            self.clean_etat(item)
 
         elif isinstance(item, NsfItem):
             self.clean_code(item)
@@ -202,7 +203,14 @@ class FormationscraperPipeline:
         if name :          
             adapter['name'] = name.strip()
         return item
-
+    
+    def clean_etat(self, item):
+        adapter = ItemAdapter(item)
+        etat = adapter.get('etat')
+        if etat :
+            etat = int(etat.strip() == "Active") 
+            adapter['etat'] = etat
+        return item
 
 
 
@@ -210,6 +218,7 @@ load_dotenv()
 
 class SQLAlchemyPipeline(object):
     def __init__(self):
+        # Charger la configuration de la base de données à partir de l'environnement
         load_dotenv()
         if bool(int(os.getenv("IS_POSTGRES"))):
             username = os.getenv("DB_USERNAME")
@@ -221,6 +230,7 @@ class SQLAlchemyPipeline(object):
         else:
             self.bdd_path = 'sqlite:///database.db'
         
+        # Créer le moteur SQLAlchemy et initialiser la session
         self.engine = create_engine(self.bdd_path)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
@@ -248,15 +258,6 @@ class SQLAlchemyPipeline(object):
             filiere=item.get("filiere"),
             id_formation=item.get("id_formation")
         )
-
-        # for certif_id,type_certif in zip(item['id_certif'],item['type_certif']):
-        #     certification = self.session.query(Certification).filter_by(certif_id=certif_id, type_certif=type_certif).first()
-        #     if certification:
-        #         formation.certifications.append(certification)
-        #     else:
-        #         new_certification = Certification(id=certif_id)#, titre="Unknown Title")
-        #         formation.certifications.append(new_certification)
-        #         self.session.add(new_certification)
 
         self.session.merge(formation)
         self.session.commit()
@@ -319,3 +320,14 @@ class SQLAlchemyPipeline(object):
     def close_spider(self, spider):
         self.session.close()
 
+
+
+
+# for certif_id,type_certif in zip(item['id_certif'],item['type_certif']):
+#     certification = self.session.query(Certification).filter_by(certif_id=certif_id, type_certif=type_certif).first()
+#     if certification:
+#         formation.certifications.append(certification)
+#     else:
+#         new_certification = Certification(certif_id=certif_id, type_certif=type_certif)
+#         formation.certifications.append(new_certification)
+#         self.session.add(new_certification)
