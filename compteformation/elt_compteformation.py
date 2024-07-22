@@ -2,12 +2,13 @@ from urllib.parse import quote_plus, urlencode
 import pandas as pd
 import requests
 import dateparser
+import logging
 
 
-### CLEAN DATAFRAME (type ref & id_certif(code_rncp & code_inventaire) ,id_certif ,indexation id_compte_formation)
+### CLEAN DATAFRAME COMPTEFORMATIONORIGINE (type ref & id_certif(code_rncp & code_inventaire) ,id_certif ,indexation id_compte_formation)
 
 #affectation des codes inventaire & code rncp a une colonne id_certif dediée
-def clean_codecertif_cf(df: pd.DataFrame):
+def clean_idcertif_cf(df: pd.DataFrame):
     """
     
     """
@@ -16,10 +17,11 @@ def clean_codecertif_cf(df: pd.DataFrame):
                                               df.loc[i, 'code_rncp'] = df.loc[i, 'code_inventaire']
     del df['code_inventaire']
     df = df.rename(columns={'code_rncp': 'id_certif'})
+    df['id_certif'] = df['id_certif'].astype(str)
     return df  
 
 #"ajout" de val de type_referentiel a valeurs de colonne id_certif 
-def clean_idcertif_cf(df: pd.DataFrame):
+#def clean_idcertif_cf(df: pd.DataFrame):
     """
 
     """
@@ -27,6 +29,11 @@ def clean_idcertif_cf(df: pd.DataFrame):
     df['id_certif'] = df['type_referentiel'] + df['id_certif']
     del df['type_referentiel']
     return df
+#modif nom type_referentiel en type_certif
+def clean_typecertif_cf(df: pd.DataFrame):
+        df = df.rename(columns={'type_referentiel': 'type_certif'})
+        return df
+      
 
 #transformation en index de id_compte_formation
 def add_idcompteformation(df: pd.DataFrame):
@@ -63,8 +70,8 @@ def load_clean_ex_rncp():
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
     df_cf_test_rncp = pd.read_json(URL_test_rncp)
-    df_cf_test_rncp = clean_codecertif_cf(df_cf_test_rncp)
     df_cf_test_rncp = clean_idcertif_cf(df_cf_test_rncp)
+    df_cf_test_rncp = clean_typecertif_cf(df_cf_test_rncp)
     df_cf_test_rncp = add_idcompteformation(df_cf_test_rncp)
     print(df_cf_test_rncp.info())
     print(df_cf_test_rncp.index)
@@ -93,16 +100,16 @@ def load_clean_ex_rs():
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
     df_cf_test_rs = pd.read_json(URL_test_rs)
-    df_cf_test_rs = clean_codecertif_cf(df_cf_test_rs)
     df_cf_test_rs = clean_idcertif_cf(df_cf_test_rs)
+    df_cf_test_rs = clean_typecertif_cf(df_cf_test_rs)
     df_cf_test_rs = add_idcompteformation(df_cf_test_rs)
     print(df_cf_test_rs.info())
     print(df_cf_test_rs.index)
     load_cf_test_rs = df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     return df_cf_test_rs
 #
-load_clean_ex_rncp()
-load_clean_ex_rs()
+#load_clean_ex_rncp()
+#load_clean_ex_rs()
 
 
 ### LOAD COMPTE FORMATION -60000 lignes! ###########################################
@@ -132,8 +139,8 @@ def load_compteformation():
     """
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=-1&timezone=UTC&use_labels=false&epsg=4326'
     df_cf_origin = pd.read_json(URL)
-    df_cf = clean_codecertif_cf(df_cf_origin)
-    df_cf = clean_idcertif_cf(df_cf)
+    df_cf = clean_idcertif_cf(df_cf_origin)
+    df_cf = clean_typecertif_cf(df_cf)
     df_cf = add_idcompteformation(df_cf)
     return df_cf
 
@@ -182,32 +189,51 @@ def update_cf():
         with open('last_update_file.txt', 'r+') as date_reader_file:
              date_buffer = date_reader_file.read()
              current_date = get_current_date()
-             if dateparser.parse(date_buffer) != dateparser.parse(current_date):
-                 load_clean_ex_rs()
-                 load_clean_ex_rncp()
-                 #load_compteformation
+             if dateparser.parse(date_buffer) != dateparser.parse(current_date):                 
                  with open('last_update_file.txt', 'w')as date_reader_file2:
-                     date_reader_file2.write(f"{current_date}")                 
+                     date_reader_file2.write(f"{current_date}")
+                 return load_clean_ex_rs()
+                 #load_clean_ex_rncp()
+                 #return load_compteformation                
              else:
                  pass
                  
        
-    except FileNotFoundError:
+    except FileNotFoundError:        
         with open('last_update_file.txt', 'a') as date_reader_file:
             last_update = get_current_date()
             date_reader_file.write(f"{last_update}")
+        return load_clean_ex_rs()
+        #return load_clean_ex_rncp()
+        #return load_compteformation
 
 
 #update_cf()
 
 ### PROCESSING COMPTEFORMATION
-#creation des dataframes from load
+#creation des dataframes a partir de la source compte formation nettoyée et mise a jour
+df_source = update_cf()
+#df_compte_formation
+
+
+#df_nfs
+
+#df_formacode
+
+#df_cf_nfs
+
+#df_cf_formacode
+
+#df_cf_certification
+
+#df_certification_certificateur
+
+#df_certificateur
 
 ## INGESTION EN BDD DIRECTEMENT, MODELS 
+#suppression de la source compteformationorigine à l etape des models?
 #to sql des dataframes?
-#ingestion via with open(csv_file_path, newline='', encoding='ISO-8859-1') as csvfile:
-        #csvreader =  csv.DictReader(csvfile, delimiter=';', quotechar='"', escapechar='\\')
-        #for row in csvreader:  ?
+
 
 
 

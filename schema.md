@@ -8,11 +8,13 @@ erDiagram
       id_formation int PK
       titre_formation varchar
       filiere varchar
+      nom_of varchar
 
   }
 
   CERTIFICATION {
       id_certif varchar PK
+      type_certif varchar PK
       certification_name varchar
       niveau varchar
       etat int
@@ -37,6 +39,7 @@ erDiagram
   FORMATION_CERTIFICATION {
       id_formation int PK, FK
       id_certif string PK, FK
+      type_certif string PK, FK
   }
 
   FORMATION_NSF {
@@ -51,6 +54,7 @@ erDiagram
 
   CERTIFICATION_CERTIFICATEUR {
       id_certif string PK, FK
+      type_certif string PK,FK
       siret string PK, FK
   }
 
@@ -69,7 +73,7 @@ erDiagram
     nom_departement varchar
     nom_region varchar
     type_referentiel varchar
-    code_certif int FK
+    id_certif int
     intitule_certification varchar
     libelle_niveau_sortie_formation varchar
     code_formacode_1 int
@@ -105,12 +109,12 @@ erDiagram
     id_compte_formation int PK, FK
     nom_of varchar
     inititule_certification varchar
-    id_certif varchar 
 
   }
   COMPTEFORMATION_CERTIFICATION {
     id_compte_formation int PK, FK
-    id_certif int PK, FK
+    id_certif varchar PK, FK
+    type_certif varchar PK, FK
   }
   COMPTEFORMATION_NSF {
     id_compte_formation int PK, FK
