@@ -12,7 +12,7 @@ import csv
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from scrapy.exceptions import DropItem
-from .models import Formation, Session, Certification, NSF, Forma, Certificateur, engine
+from .models import Formation, Session, Certification, NSF, Forma, Certificateur, formation_certification, certification_nsf, certification_forma, certification_certificateur
 from dateutil.parser import parse
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -214,8 +214,6 @@ class FormationscraperPipeline:
 
 
 
-load_dotenv()
-
 class SQLAlchemyPipeline(object):
     def __init__(self):
         # Charger la configuration de la base de données à partir de l'environnement
@@ -262,6 +260,11 @@ class SQLAlchemyPipeline(object):
         self.session.merge(formation)
         self.session.commit()
 
+        # Associer la formation avec les certifications
+        for id_certif, type_certif in list(set(zip(item.get("id_certif"), item.get("type_certif")))):
+            self.session.execute(formation_certification.insert().values(id_formation=formation.id_formation, id_certif=id_certif, type_certif=type_certif))
+            self.session.commit()
+
     def save_session(self, item):
         session = Session(
             id_formation=item.get("id_formation"),
@@ -301,12 +304,19 @@ class SQLAlchemyPipeline(object):
         self.session.merge(nsf)
         self.session.commit()
 
+        self.session.execute(certification_nsf.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), nsf_code=nsf.nsf_code))
+        self.session.commit()
+
     def save_forma(self, item):
+        forma_code = item.get("code")
         forma = Forma(
-            forma_code=item.get("code"),
+            forma_code=forma_code,
             forma_name=item.get("name")
         )
         self.session.merge(forma)
+        self.session.commit()
+
+        self.session.execute(certification_forma.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), forma_code=forma_code))
         self.session.commit()
 
     def save_certificateur(self, item):
@@ -317,17 +327,9 @@ class SQLAlchemyPipeline(object):
         self.session.merge(certificateur)
         self.session.commit()
 
+        self.session.execute(certification_certificateur.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), siret=certificateur.siret))
+        self.session.commit()
+
     def close_spider(self, spider):
         self.session.close()
 
-
-
-
-# for certif_id,type_certif in zip(item['id_certif'],item['type_certif']):
-#     certification = self.session.query(Certification).filter_by(certif_id=certif_id, type_certif=type_certif).first()
-#     if certification:
-#         formation.certifications.append(certification)
-#     else:
-#         new_certification = Certification(certif_id=certif_id, type_certif=type_certif)
-#         formation.certifications.append(new_certification)
-#         self.session.add(new_certification)
