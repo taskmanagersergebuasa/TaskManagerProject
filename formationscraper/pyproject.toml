@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "taskmanagerproject"
+version = "0.1.0"
+description = ""
+authors = ["laetitia <dauchyla@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.2"
+scrapy = "^2.11.2"
+dateparser = "^1.2.0"
+pyopenssl = "==24.1.0"
+sqlalchemy = "^2.0.31"
+fastapi = "^0.111.1"
+python-dateutil = "^2.9.0.post0"
+uvicorn = "^0.30.3"
+pydantic-settings = "^2.3.4"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
