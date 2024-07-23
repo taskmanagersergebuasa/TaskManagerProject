@@ -26,19 +26,20 @@ def clean_typecertif_cf(df: pd.DataFrame):
         return df
       
 
-#transformation en index de id_compte_formation
+#transformation en colonne avec valeurs index  de id_compte_formation
 def add_idcompteformation(df: pd.DataFrame):
     """
     _
     """
     df.insert(0, 'id_compte_formation', range(0, len(df)))
-    df.set_index(keys=['id_compte_formation'], inplace=True)
+    #df.set_index(keys=['id_compte_formation'], inplace=True)
+    #df.reset_index()
     return df
                       
 
 
 ### EXEMPLES RNCP & RS 100 lignes en exemple####################################
-#
+#structure encode url :100 lignes rncp, puis fonction de requete qui renvoie un dataframe
 base_url = "https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json"
 query_params_test_rncp = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
@@ -64,12 +65,12 @@ def load_clean_ex_rncp():
     df_cf_test_rncp = clean_idcertif_cf(df_cf_test_rncp)
     df_cf_test_rncp = clean_typecertif_cf(df_cf_test_rncp)
     df_cf_test_rncp = add_idcompteformation(df_cf_test_rncp)
-    print(df_cf_test_rncp.info())
-    print(df_cf_test_rncp.index)
+    #print(df_cf_test_rncp.info())
+    #print(df_cf_test_rncp.index)
     load_cf_test_rncp = df_cf_test_rncp.to_csv('compteformation/test_cf_rncp')
     return df_cf_test_rncp
 
-# 
+#structure encode url :100 lignes rs, puis fonction de requete qui renvoie un dataframe
 query_params_test_rs = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
     #"where": 'libelle_nsf_1 like "Informatique, traitement de l\'information, réseaux de transmission"',
@@ -94,18 +95,19 @@ def load_clean_ex_rs():
     df_cf_test_rs = clean_idcertif_cf(df_cf_test_rs)
     df_cf_test_rs = clean_typecertif_cf(df_cf_test_rs)
     df_cf_test_rs = add_idcompteformation(df_cf_test_rs)
+    #print(df_cf_test_rs.info())
+    #print(df_cf_test_rs.index)
+    df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     print(df_cf_test_rs.info())
-    print(df_cf_test_rs.index)
-    load_cf_test_rs = df_cf_test_rs.to_csv('compteformation/test_cf_rs')
     return df_cf_test_rs
 #
-load_clean_ex_rncp()
-load_clean_ex_rs()
+#load_clean_ex_rncp()
+#load_clean_ex_rs()
 
 
 ### LOAD COMPTE FORMATION -60000 lignes! ###########################################
 
-
+#structure encode url fichier complet, puis fonction de requete qui renvoie un dataframe
 #affiner avec des criteres proches de simplon(listes codes nfs et formacode)
 query_params = {
     "select": "date_extract, nom_of, nom_departement, nom_region, type_referentiel, code_inventaire, code_rncp, intitule_certification, libelle_niveau_sortie_formation, code_formacode_1, code_formacode_2, code_formacode_3, code_formacode_4, code_formacode_5, libelle_code_formacode_principal, libelle_nsf_1, libelle_nsf_2, libelle_nsf_3, code_nsf_1, code_nsf_2, code_nsf_3, code_certifinfo, siret, nb_action, nb_session_active, nb_session_a_distance, nombre_heures_total_min, nombre_heures_total_max, nombre_heures_total_mean, frais_ttc_tot_min, frais_ttc_tot_max, frais_ttc_tot_mean, code_departement, code_region, nbaction_nbheures, coderegion_export",
@@ -134,10 +136,6 @@ def load_compteformation():
     df_cf = clean_typecertif_cf(df_cf)
     df_cf = add_idcompteformation(df_cf)
     return df_cf
-
-
-     
-
 
 #load_compteformation()
 
@@ -175,17 +173,18 @@ def get_current_date():
 def update_cf():
     """
 
-    """  
+    """
     try:
         with open('last_update_file.txt', 'r+') as date_reader_file:
              date_buffer = date_reader_file.read()
              current_date = get_current_date()
-             if dateparser.parse(date_buffer) != dateparser.parse(current_date):                 
-                 with open('last_update_file.txt', 'w')as date_reader_file2:
+             if dateparser.parse(date_buffer) != dateparser.parse(current_date):
+                 with open('last_update_file.txt', 'w') as date_reader_file2:
                      date_reader_file2.write(f"{current_date}")
                  return load_clean_ex_rs()
-                 #load_clean_ex_rncp()
-                 #return load_compteformation                
+                 #return load_clean_ex_rncp()
+                 #return load_compteformation   
+                              
              else:
                  pass
                  
@@ -195,6 +194,8 @@ def update_cf():
             last_update = get_current_date()
             date_reader_file.write(f"{last_update}")
         return load_clean_ex_rs()
+        
+        
         #return load_clean_ex_rncp()
         #return load_compteformation
 
@@ -202,8 +203,83 @@ def update_cf():
 #update_cf()
 
 ### PROCESSING COMPTEFORMATION
+# concatenation d' un choix de colonnes de compteformation origine pour construire les dataframes correspondant aux tables cibles
+def processing_compteformation():
+      # liste des dataframes 
+      df_list = []
+
+      #df_source
+      df_source = update_cf()
+      print(df_source.info())
+      df_source.drop_duplicates(subset=df_source.columns.difference(['id_compte_formation']))
+      df_list.append(df_source)
+      print(df_source.info())
+     
+      #df_compte_formation
+      df_compte_formation = pd.concat([df_source['id_compte_formation'], df_source['nom_of'], df_source['intitule_certification']], axis=1)
+      df_compte_formation.drop_duplicates(subset=df_compte_formation.columns.difference(['id_compte_formation']))
+      df_list.append(df_compte_formation)
+      print(df_compte_formation.info())
+      print(df_list)
+
+      #df_nfs OK
+      df_nsf = pd.DataFrame()
+      # concatenation verticale des codes nfs en NFS_code et suppression valeur nulles
+      df_nsf['NSF_code'] = pd.concat([df_source['code_nsf_1'], df_source['code_nsf_2'], df_source['code_nsf_3']])
+      se_code = df_nsf['NSF_code'].dropna()
+      print(se_code.info())
+      # concatenation verticale des libelles ou nfs name en NFS_name et suppression valeurs nulles
+      df_nsf['NSF_name'] = pd.concat([df_source['libelle_nsf_1'], df_source['libelle_nsf_2'], df_source['libelle_nsf_3']])  
+      se_name = df_nsf['NSF_name'].dropna()
+      print(se_name.info())            
+      # concatenation de NFS_code et NFS_name
+      df_nsf = pd.concat([se_code, se_name], axis=1)
+      # suppression lignes doublons
+      df_nsf = df_nsf.drop_duplicates()
+      # suppression lignes valeurs nulles ou manquantes
+      #df_nsf = df_nsf.dropna()
+      print(df_nsf.info())
+      # ajout à la liste des dataframe
+      df_list.append(df_nsf)
+
+      #df_forma OK
+      df_forma = pd.DataFrame()
+      # concatenation verticale des codes formacodes  en NFS_code
+      df_forma['forma_code'] = pd.concat([df_source['code_formacode_1'], df_source['code_formacode_2'], df_source['code_formacode_3'], df_source['code_formacode_4'], df_source['code_formacode_5']])
+      #print(df_forma['forma_code'])
+      # affectation des libelles_code_formacode_principalà colonne forma_name
+      df_forma['forma_name'] = df_source['libelle_code_formacode_principal']
+      #print(df_forma['forma_name'])             
+      #A TRAITER concatenation de forma_code et forma_name => je veux juste les lignes ou forma_code est non nul!!!
+      df_forma = pd.concat([df_forma['forma_code'], df_forma['forma_name']], axis=1)
+      #suppression lignes doublons
+      df_forma = df_forma.drop_duplicates()
+      #suppression lignes avec au moins 1 valeur nulle dans colonne formacode)
+      df_forma = df_forma.dropna(subset=['forma_code'])
+      #print(df_forma.info())
+      #ajout à la liste des dataframe
+      df_list.append(df_forma)
+
+      #df_certification
+      
+
+
+      
 
 
 
 
+
+
+
+
+
+
+
+#df_compteformation = df_source['id_compte_formation']
+#load_ex_compteformation = df_compteformation.to_csv('compteformation/test_compteformation')
+
+
+
+processing_compteformation()
 
