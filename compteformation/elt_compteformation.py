@@ -3,6 +3,11 @@ import pandas as pd
 import requests
 import dateparser
 import logging
+from sqlalchemy import Date, String, create_engine
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 ### CLEAN DATAFRAME COMPTEFORMATIONORIGINE (type ref & id_certif(code_rncp & code_inventaire) ,id_certif ,indexation id_compte_formation)
@@ -205,22 +210,20 @@ def update_cf():
 ### PROCESSING COMPTEFORMATION
 # concatenation d' un choix de colonnes de compteformation origine pour construire les dataframes correspondant aux tables cibles
 def processing_compteformation():
-      # liste des dataframes 
-      df_list = []
+      # dictionnaire {nom_de_table : dataframe} des dataframes 
+      df_dict = {}
 
       #df_source
       df_source = update_cf()
       print(df_source.info())
       df_source.drop_duplicates(subset=df_source.columns.difference(['id_compte_formation']))
-      df_list.append(df_source)
-      print(df_source.info())
      
-      #df_compte_formation
+      #df_compte_formation OK
       df_compte_formation = pd.concat([df_source['id_compte_formation'], df_source['nom_of'], df_source['intitule_certification']], axis=1)
       df_compte_formation.drop_duplicates(subset=df_compte_formation.columns.difference(['id_compte_formation']))
-      df_list.append(df_compte_formation)
+      df_dict['compteformation'] = df_compte_formation
       print(df_compte_formation.info())
-      print(df_list)
+      print(df_dict)
 
       #df_nfs OK
       df_nsf = pd.DataFrame()
@@ -239,8 +242,9 @@ def processing_compteformation():
       # suppression lignes valeurs nulles ou manquantes
       #df_nsf = df_nsf.dropna()
       print(df_nsf.info())
-      # ajout à la liste des dataframe
-      df_list.append(df_nsf)
+      # ajout au dictionnaire de dataframe
+      df_dict['nsf'] = df_nsf
+      print(df_dict)
 
       #df_forma OK
       df_forma = pd.DataFrame()
@@ -257,22 +261,46 @@ def processing_compteformation():
       #suppression lignes avec au moins 1 valeur nulle dans colonne formacode)
       df_forma = df_forma.dropna(subset=['forma_code'])
       #print(df_forma.info())
-      #ajout à la liste des dataframe
-      df_list.append(df_forma)
-
+      # ajout au dictionnaire de dataframe
+      df_dict['forma'] = df_forma
+      print(df_dict)
       #df_certification
+
+
+      return df_dict
+
+
+##### INGESTION DES TABLES A PARTIR DES DATAFRAMES du dictionnaire
+# il faut construire  l' env de connection: done
+def ingest_tables(df_dict: dict):
+      #environnement de connection serveur bdd et sqlalchemy
+      if bool(int(os.getenv("IS_POSTGRES"))):
+        username = os.getenv("DB_USERNAME")
+        hostname = os.getenv("DB_HOSTNAME")
+        port = os.getenv("DB_PORT")
+        database_name = os.getenv("DB_NAME")
+        password = os.getenv("DB_PASSWORD")
+        bdd_path = f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{database_name}"
+      else:
+            bdd_path = 'sqlite:///database.db'
+
+      engine = create_engine(bdd_path)
+      #engine = create_engine('sqlite://', echo=False)
+     
+      #  Base = declarative_base()
+      if engine.dialect.name == 'sqlite':
+        date_type = String
+      elif engine.dialect.name == 'postgresql+psycopg2':
+             date_type = Date
+      else:
+            raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
       
-
-
+      df = pd.DataFrame()
+      for nom_table, df in df_dict.items():
+            if isinstance(df, pd.DataFrame) & isinstance(nom_table, str):
+                  df.to_sql(nom_table, engine)
+            
       
-
-
-
-
-
-
-
-
 
 
 
@@ -281,5 +309,7 @@ def processing_compteformation():
 
 
 
-processing_compteformation()
+dict = processing_compteformation()
+
+ingest_tables(dict)
 
