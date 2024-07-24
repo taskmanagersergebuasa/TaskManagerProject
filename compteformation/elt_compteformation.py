@@ -4,8 +4,12 @@ import requests
 import dateparser
 import logging
 from sqlalchemy import Date, String, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+
 import os
 from dotenv import load_dotenv
+
+from formationscraper.formationscraper import models
 
 load_dotenv()
 
@@ -264,7 +268,9 @@ def processing_compteformation():
       # ajout au dictionnaire de dataframe
       df_dict['forma'] = df_forma
       print(df_dict)
+
       #df_certification
+      
 
 
       return df_dict
@@ -287,18 +293,22 @@ def ingest_tables(df_dict: dict):
       engine = create_engine(bdd_path)
       #engine = create_engine('sqlite://', echo=False)
      
-      #  Base = declarative_base()
+      models.Base = declarative_base()
       if engine.dialect.name == 'sqlite':
         date_type = String
-      elif engine.dialect.name == 'postgresql+psycopg2':
+      elif engine.dialect.name == 'postgresql':
              date_type = Date
       else:
             raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
       
       df = pd.DataFrame()
       for nom_table, df in df_dict.items():
+            print("item")
+            print(isinstance(df, pd.DataFrame))
+            print(isinstance(nom_table, str))
             if isinstance(df, pd.DataFrame) & isinstance(nom_table, str):
-                  df.to_sql(nom_table, engine)
+                  print("verif if")
+                  df.to_sql(nom_table, engine, if_exists="append", index=False)
             
       
 
