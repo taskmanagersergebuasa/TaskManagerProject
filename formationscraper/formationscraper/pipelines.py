@@ -290,13 +290,13 @@ class SQLAlchemyPipeline(object):
         ).first()
 
         # Si l'association n'existe pas, l'insérer
-        if existing_association is None:
-            try:
-                self.session.execute(formation_certification.insert().values(id_formation=formation.id_formation, id_certif=id_certif, type_certif=type_certif))
-                self.session.commit()
-            except IntegrityError as e:
-                self.session.rollback()
-                raise
+            if existing_association is None:
+                try:
+                    self.session.execute(formation_certification.insert().values(id_formation=formation.id_formation, id_certif=id_certif, type_certif=type_certif))
+                    self.session.commit()
+                except IntegrityError as e:
+                    self.session.rollback()
+                    raise
 
     def save_session(self, item):
         session = Session(
