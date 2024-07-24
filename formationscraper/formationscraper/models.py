@@ -26,7 +26,7 @@ else:
     raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
     
 
-# Définir les tables d'association en premier
+
 certification_forma = Table(
     'certification_forma',
     Base.metadata,
@@ -143,6 +143,7 @@ class Forma(Base):
     certifications = relationship('Certification',
                               secondary=certification_forma,
                               back_populates='formas')
+    
 
 engine = create_engine(bdd_path)
 Base.metadata.create_all(engine)
