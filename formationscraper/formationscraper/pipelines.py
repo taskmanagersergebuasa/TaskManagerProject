@@ -307,11 +307,9 @@ class SQLAlchemyPipeline(object):
             date_debut=item.get("date_debut"),
             duree=item.get("duree")
         )
-        try:
-            self.session.merge(session)
-            self.session.commit()
-        except:
-            self.session.rollback()
+        self.session.merge(session)
+        self.session.commit()
+        
 
     def save_rncp(self, item):
         rncp = Certification(
@@ -321,11 +319,9 @@ class SQLAlchemyPipeline(object):
             niveau=item.get("niveau"),
             etat=item.get("etat")
         )
-        try:
-            self.session.merge(rncp)
-            self.session.commit()
-        except:
-            self.session.rollback()
+        self.session.merge(rncp)
+        self.session.commit()
+        
 
     def save_rs(self, item):
         rs = Certification(
@@ -334,23 +330,18 @@ class SQLAlchemyPipeline(object):
             certif_name=item.get("titre"),
             etat=item.get("etat")
         )
-        try:
-            self.session.merge(rs)
-            self.session.commit()
-        except:
-            self.session.rollback()
+        self.session.merge(rs)
+        self.session.commit()
+        
 
     def save_nsf(self, item):
         nsf = NSF(
             nsf_code=item.get("code"),
             nsf_name=item.get("name")
         )
-        try:
-            self.session.merge(nsf)
-            self.session.commit()
-        except:
-            self.session.rollback()
-
+        self.session.merge(nsf)
+        self.session.commit()
+        
         existing_association = self.session.execute(
             select(certification_nsf)
             .where(certification_nsf.c.id_certif==str(item.get("id_certif")))
@@ -374,11 +365,10 @@ class SQLAlchemyPipeline(object):
             forma_code=forma_code,
             forma_name=item.get("name")
         )
-        try:
-            self.session.merge(forma)
-            self.session.commit()
-        except:
-            self.session.rollback()
+        
+        self.session.merge(forma)
+        self.session.commit()
+        
 
         existing_association = self.session.execute(
             select(certification_forma)
@@ -402,11 +392,10 @@ class SQLAlchemyPipeline(object):
             siret=item.get("siret"),
             legal_name=item.get("certificateur_name")
         )
-        try:
-            self.session.merge(certificateur)
-            self.session.commit()
-        except:
-            self.session.rollback()
+        
+        self.session.merge(certificateur)
+        self.session.commit()
+        
 
         existing_association = self.session.execute(
             select(certification_certificateur)
