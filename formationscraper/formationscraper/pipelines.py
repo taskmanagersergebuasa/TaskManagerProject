@@ -6,17 +6,15 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
-import re
-import csv
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
-from scrapy.exceptions import DropItem
-from .models import Formation, Session, Certification, NSF, Forma, Certificateur, formation_certification, certification_nsf, certification_forma, certification_certificateur
 from dateutil.parser import parse
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-import os
+from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
+from .db.models import Formation, Session, Certification, NSF, Forma, Certificateur, formation_certification, certification_nsf, certification_forma, certification_certificateur
+from .db.session import get_session, choice_bdd
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
+import re
+import csv
 
 class CsvPipeline:
     def open_spider(self, spider):
@@ -90,7 +88,6 @@ class FormationscraperPipeline:
 
         return item
     
-
 
     def clean_certificateur_name(self,item):
         adapter = ItemAdapter(item)
@@ -213,25 +210,16 @@ class FormationscraperPipeline:
         return item
 
 
-
 class SQLAlchemyPipeline(object):
     def __init__(self):
         # Charger la configuration de la base de données à partir de l'environnement
         load_dotenv()
-        if bool(int(os.getenv("IS_POSTGRES"))):
-            username = os.getenv("DB_USERNAME")
-            hostname = os.getenv("DB_HOSTNAME")
-            port = os.getenv("DB_PORT")
-            database_name = os.getenv("DB_NAME")
-            password = os.getenv("DB_PASSWORD")
-            self.bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
-        else:
-            self.bdd_path = 'sqlite:///database.db'
+        self.bdd_path = choice_bdd()
         
         # Créer le moteur SQLAlchemy et initialiser la session
-        self.engine = create_engine(self.bdd_path)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+        self.SessionLocal = get_session(self.bdd_path)
+        self.session = self.SessionLocal()
+        
 
     def process_item(self, item, spider):
         if isinstance(item, FormationItem):
@@ -250,6 +238,34 @@ class SQLAlchemyPipeline(object):
             self.save_certificateur(item)
         return item
 
+    def check_and_insert(session, table, unique_constraints, values):
+        """
+        Pour éviter les doublons et UNIQUE constraint, vérifie l'existence d'une association dans la table et l'insère si elle n'existe pas.
+        créé dans l'objectif de factoriser, mais ne fonctionne pas pour l'instant
+
+        :param session: La session SQLAlchemy
+        :param table: L'objet de la table SQLAlchemy
+        :param where_conditions: Un dictionnaire des conditions WHERE
+        :param values: Un dictionnaire des valeurs à insérer
+        """
+
+        # Construire la requête de sélection pour vérifier l'existence
+        query = select([table])
+        for column, value in unique_constraints.items():
+            query = query.where(column == value)
+
+        existing_association = session.execute(query).first()
+
+        # Si l'association n'existe pas, insérer
+        if existing_association is None:
+            try:
+                session.execute(table.insert().values(values))
+                session.commit()
+            except IntegrityError as e:
+                session.rollback()
+                raise
+
+
     def save_formation(self, item):
         formation = Formation(
             titre_formation=item.get("titre_formation"),
@@ -261,9 +277,26 @@ class SQLAlchemyPipeline(object):
         self.session.commit()
 
         # Associer la formation avec les certifications
-        for id_certif, type_certif in list(set(zip(item.get("id_certif"), item.get("type_certif")))):
-            self.session.execute(formation_certification.insert().values(id_formation=formation.id_formation, id_certif=id_certif, type_certif=type_certif))
-            self.session.commit()
+        for id_certif, type_certif in list(set(zip(item.get("id_certif"), item.get("type_certif")))):         
+        
+        ### complété suite à pb de contrainte UNIQUE (doublons)
+
+            # Vérifier si l'association existe déjà
+            existing_association = self.session.execute(
+            select(formation_certification)
+            .where(formation_certification.c.id_formation == formation.id_formation)
+            .where(formation_certification.c.id_certif == id_certif)
+            .where(formation_certification.c.type_certif == type_certif)
+        ).first()
+
+        # Si l'association n'existe pas, l'insérer
+            if existing_association is None:
+                try:
+                    self.session.execute(formation_certification.insert().values(id_formation=formation.id_formation, id_certif=id_certif, type_certif=type_certif))
+                    self.session.commit()
+                except IntegrityError as e:
+                    self.session.rollback()
+                    raise
 
     def save_session(self, item):
         session = Session(
@@ -304,8 +337,22 @@ class SQLAlchemyPipeline(object):
         self.session.merge(nsf)
         self.session.commit()
 
-        self.session.execute(certification_nsf.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), nsf_code=nsf.nsf_code))
-        self.session.commit()
+        existing_association = self.session.execute(
+            select(certification_nsf)
+            .where(certification_nsf.c.id_certif==item.get("id_certif"))
+            .where(certification_nsf.c.type_certif==item.get("type_certif"))
+            .where(certification_nsf.c.nsf_code==nsf.nsf_code)
+        ).first()
+
+        # Si l'association n'existe pas, l'insérer
+        if existing_association is None:
+            try:
+                self.session.execute(certification_nsf.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), nsf_code=nsf.nsf_code))
+                self.session.commit()
+            except IntegrityError as e:
+                self.session.rollback()
+                raise
+
 
     def save_forma(self, item):
         forma_code = item.get("code")
@@ -316,8 +363,22 @@ class SQLAlchemyPipeline(object):
         self.session.merge(forma)
         self.session.commit()
 
-        self.session.execute(certification_forma.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), forma_code=forma_code))
-        self.session.commit()
+        existing_association = self.session.execute(
+            select(certification_forma)
+            .where(certification_forma.c.id_certif==item.get("id_certif"))
+            .where(certification_forma.c.type_certif==item.get("type_certif"))
+            .where(certification_forma.c.forma_code==forma_code)
+        ).first()
+
+        # Si l'association n'existe pas, l'insérer
+        if existing_association is None:
+            try:
+                self.session.execute(certification_forma.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), forma_code=forma_code))
+                self.session.commit()
+            except IntegrityError as e:
+                self.session.rollback()
+                raise
+
 
     def save_certificateur(self, item):
         certificateur = Certificateur(
@@ -327,9 +388,113 @@ class SQLAlchemyPipeline(object):
         self.session.merge(certificateur)
         self.session.commit()
 
-        self.session.execute(certification_certificateur.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), siret=certificateur.siret))
-        self.session.commit()
+        existing_association = self.session.execute(
+            select(certification_certificateur)
+            .where(certification_certificateur.c.id_certif==item.get("id_certif"))
+            .where(certification_certificateur.c.type_certif==item.get("type_certif"))
+            .where(certification_certificateur.c.siret==certificateur.siret)
+        ).first()
+
+        # Si l'association n'existe pas, l'insérer
+        if existing_association is None:
+            try:
+                self.session.execute(certification_certificateur.insert().values(id_certif=item.get("id_certif"), type_certif=item.get("type_certif"), siret=certificateur.siret))
+                self.session.commit()
+            except IntegrityError as e:
+                self.session.rollback()
+                raise
+
+        ### appel de la fonction factorisée (qui ne fonctionne pas encore...) 
+        # self.check_and_insert(
+        #     self.session,
+        #     certification_certificateur,
+        #     {
+        #         certification_certificateur.c.id_certif: item.get("id_certif"),
+        #         certification_certificateur.c.type_certif: item.get("type_certif"),
+        #         certification_certificateur.c.siret: certificateur.siret
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'siret': certificateur.siret
+        #             }
+        #         )
+
+
+
+
 
     def close_spider(self, spider):
         self.session.close()
 
+
+
+
+
+#######
+
+
+        # # 1) formation_certification
+        # 
+        # check_and_insert_association(
+        #     self.session,
+        #     formation_certification,
+        #     {
+        #         formation_certification.c.id_formation: formation.id_formation,
+        #         formation_certification.c.id_certif: id_certif,
+        #         formation_certification.c.type_certif: type_certif
+        #     },
+        #     {
+        #         'id_formation': formation.id_formation,
+        #         'id_certif': id_certif,
+        #         'type_certif': type_certif
+        #     }
+        # )
+
+        # # 2) certification_nsf
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_nsf,
+        #     {
+        #         certification_nsf.c.id_certif: item.get("id_certif"),
+        #         certification_nsf.c.type_certif: item.get("type_certif"),
+        #         certification_nsf.c.nsf_code: nsf.nsf_code
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'nsf_code': nsf.nsf_code
+        #     }
+        # )
+
+        # # 3) certification_forma
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_forma,
+        #     {
+        #         certification_forma.c.id_certif: item.get("id_certif"),
+        #         certification_forma.c.type_certif: item.get("type_certif"),
+        #         certification_forma.c.forma_code: forma_code
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'forma_code': forma_code
+        #     }
+        # )
+
+        # # 4) certification_certificateur
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_certificateur,
+        #     {
+        #         certification_certificateur.c.id_certif: item.get("id_certif"),
+        #         certification_certificateur.c.type_certif: item.get("type_certif"),
+        #         certification_certificateur.c.siret: certificateur.siret
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'siret': certificateur.siret
+        #     }
+        # )

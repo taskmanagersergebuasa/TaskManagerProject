@@ -1,4 +1,4 @@
-# TaskManagerProject# TaskManagerProject
+# TaskManagerProject
 
 ajouter le .env :
 /TaskManagerProject/formationscraper/.env
