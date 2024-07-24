@@ -272,9 +272,11 @@ class SQLAlchemyPipeline(object):
             filiere=item.get("filiere"),
             id_formation=item.get("id_formation")
         )
-
-        self.session.merge(formation)
-        self.session.commit()
+        try:
+            self.session.merge(formation)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
         # Associer la formation avec les certifications
         for id_certif, type_certif in list(set(zip(item.get("id_certif"), item.get("type_certif")))):         
@@ -285,7 +287,7 @@ class SQLAlchemyPipeline(object):
             existing_association = self.session.execute(
             select(formation_certification)
             .where(formation_certification.c.id_formation == formation.id_formation)
-            .where(formation_certification.c.id_certif == id_certif)
+            .where(formation_certification.c.id_certif == str(id_certif))
             .where(formation_certification.c.type_certif == type_certif)
         ).first()
 
@@ -305,41 +307,53 @@ class SQLAlchemyPipeline(object):
             date_debut=item.get("date_debut"),
             duree=item.get("duree")
         )
-        self.session.merge(session)
-        self.session.commit()
+        try:
+            self.session.merge(session)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
     def save_rncp(self, item):
         rncp = Certification(
-            id_certif=item.get("id_certif"),
+            id_certif=str(item.get("id_certif")),
             type_certif=item.get("type_certif"),
             certif_name=item.get("titre"),
             niveau=item.get("niveau"),
             etat=item.get("etat")
         )
-        self.session.merge(rncp)
-        self.session.commit()
+        try:
+            self.session.merge(rncp)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
     def save_rs(self, item):
         rs = Certification(
-            id_certif=item.get("id_certif"),
+            id_certif=str(item.get("id_certif")),
             type_certif=item.get("type_certif"),
             certif_name=item.get("titre"),
             etat=item.get("etat")
         )
-        self.session.merge(rs)
-        self.session.commit()
+        try:
+            self.session.merge(rs)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
     def save_nsf(self, item):
         nsf = NSF(
             nsf_code=item.get("code"),
             nsf_name=item.get("name")
         )
-        self.session.merge(nsf)
-        self.session.commit()
+        try:
+            self.session.merge(nsf)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
         existing_association = self.session.execute(
             select(certification_nsf)
-            .where(certification_nsf.c.id_certif==item.get("id_certif"))
+            .where(certification_nsf.c.id_certif==str(item.get("id_certif")))
             .where(certification_nsf.c.type_certif==item.get("type_certif"))
             .where(certification_nsf.c.nsf_code==nsf.nsf_code)
         ).first()
@@ -360,12 +374,15 @@ class SQLAlchemyPipeline(object):
             forma_code=forma_code,
             forma_name=item.get("name")
         )
-        self.session.merge(forma)
-        self.session.commit()
+        try:
+            self.session.merge(forma)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
         existing_association = self.session.execute(
             select(certification_forma)
-            .where(certification_forma.c.id_certif==item.get("id_certif"))
+            .where(certification_forma.c.id_certif==str(item.get("id_certif")))
             .where(certification_forma.c.type_certif==item.get("type_certif"))
             .where(certification_forma.c.forma_code==forma_code)
         ).first()
@@ -385,12 +402,15 @@ class SQLAlchemyPipeline(object):
             siret=item.get("siret"),
             legal_name=item.get("certificateur_name")
         )
-        self.session.merge(certificateur)
-        self.session.commit()
+        try:
+            self.session.merge(certificateur)
+            self.session.commit()
+        except:
+            self.session.rollback()
 
         existing_association = self.session.execute(
             select(certification_certificateur)
-            .where(certification_certificateur.c.id_certif==item.get("id_certif"))
+            .where(certification_certificateur.c.id_certif==str(item.get("id_certif")))
             .where(certification_certificateur.c.type_certif==item.get("type_certif"))
             .where(certification_certificateur.c.siret==certificateur.siret)
         ).first()
