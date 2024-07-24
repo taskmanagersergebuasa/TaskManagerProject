@@ -270,7 +270,7 @@ def processing_compteformation():
       print(df_dict)
 
       #df_certification
-      
+      ""
 
 
       return df_dict
