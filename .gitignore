@@ -183,6 +183,8 @@ crash.*.log
 # to change depending on the environment.
 *.tfvars
 *.tfvars.json
+*.tfstate
+*.tfplan
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
@@ -202,6 +204,6 @@ override.tf.json
 terraform.rc
 
 
-terra/.terraform
+
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform
