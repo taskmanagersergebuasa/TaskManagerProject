@@ -89,16 +89,16 @@ class Formation(Base):
     certifications = relationship('Certification',
                                   secondary=formation_certification,
                                   back_populates='formations')
-    sessions = relationship("Session", back_populates="formations")
+    sessions = relationship("Session", back_populates="formation")
 
 class Session(Base):
     __tablename__ = 'session'
-    id_session = Column(Integer, primary_key=True, autoincrement=True)
+    id_session = Column(Integer, primary_key=True)
     id_formation = Column(Integer, ForeignKey('formation.id_formation')) 
     location = Column(String)
     duree = Column(Integer)
     date_debut = Column(date_type)
-    formations = relationship("Formation", back_populates="sessions")
+    formation = relationship("Formation", back_populates="sessions")
 
 class Certification(Base):
     __tablename__ = 'certification'

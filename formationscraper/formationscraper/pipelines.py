@@ -119,7 +119,7 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         id_formation = adapter.get('id_formation')
         if id_formation:
-            match = re.search(r'(\d+)(?=/|$)', id_formation)
+            match = re.search(r'(\d+)/?$', id_formation)
             if match:
                 adapter['id_formation'] = int(match.group(1))
             else:
@@ -143,7 +143,7 @@ class FormationscraperPipeline:
     def clean_id_certif(self, item):
         adapter = ItemAdapter(item)
         id_certif = adapter.get('id_certif')
-        adapter['id_certif'] = list(set([int(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2))
+        adapter['id_certif'] = list(set([re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2)
         for element in id_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]))
         return item
         

@@ -72,7 +72,7 @@ resource "azurerm_container_app_job" "container_job" {
   template {
     
     container {
-      image = "${var.server_name}/${var.image_name}"
+      image = "${var.server_name}/${var.image_origin}"
 
       name  = var.image_name
       cpu    = 0.5

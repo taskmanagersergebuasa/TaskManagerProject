@@ -53,10 +53,16 @@ variable "container_registry_name" {
   description = "The container registry name."
 }
 
+variable "image_origin" {
+  type        = string
+  description = "The image docker origin name."
+}
+
 variable "image_name" {
   type        = string
-  description = "The image docker name."
+  description = "The image azure docker name."
 }
+
 variable "server_name" {
   type        = string
   description = "The name of the server on which the image is stored."
