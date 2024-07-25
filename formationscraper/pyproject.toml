@@ -16,7 +16,7 @@ fastapi = "^0.111.1"
 python-dateutil = "^2.9.0.post0"
 uvicorn = "^0.30.3"
 pydantic-settings = "^2.3.4"
-
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
