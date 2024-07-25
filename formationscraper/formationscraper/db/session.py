@@ -27,7 +27,7 @@ def choice_bdd() :
         hostname = settings.DB_HOSTNAME
         port = settings.DB_PORT
         database_name = settings.DB_NAME
-        bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+        bdd_path = f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{database_name}"
     else:
         bdd_path = settings.DATABASE_SQLITE
     return bdd_path

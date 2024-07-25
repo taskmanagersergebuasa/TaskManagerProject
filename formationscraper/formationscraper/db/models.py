@@ -121,5 +121,15 @@ class Forma(Base):
     forma_name = Column(String)
     certifications = relationship('Certification',
                               secondary=certification_forma,
-                              back_populates='formas')
+                              back_populates='formas')    
     
+
+class CompteFormation(Base):
+    __tablename__ = 'compteformation'
+    id_compte_formation = Column(Integer, primary_key=True)
+    nom_of = Column(String)
+    intitule_certification = Column(String)
+    
+    
+engine = create_engine(bdd_path)
+Base.metadata.create_all(engine)

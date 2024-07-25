@@ -5,7 +5,7 @@ simplon formation schema
 erDiagram
 
   FORMATION {
-      id_formation int PK
+      id_formation int PK, FK
       titre_formation varchar
       filiere varchar
       nom_of varchar
@@ -21,8 +21,8 @@ erDiagram
   }
 
   NSF {
-      NSF_code int PK
-      NSF_name varchar
+      nsf_code int PK
+      nsf_name varchar
   }
 
   FORMA {
@@ -45,7 +45,7 @@ erDiagram
   CERTIFICATION_NSF {
       id_certif varchar PK, FK
       type_certif varchar PK,FK
-      NSF_code int PK, FK
+      nsf_code int PK, FK
   }
 
   CERTIFICATION_FORMA {
@@ -71,7 +71,7 @@ erDiagram
   COMPTEFORMATION {
     id_compte_formation int PK, FK
     nom_of varchar
-    inititule_certification varchar
+    intitule_certification varchar
 
   }
   COMPTEFORMATION_CERTIFICATION {
@@ -81,7 +81,7 @@ erDiagram
   }
   COMPTEFORMATION_NSF {
     id_compte_formation int PK, FK
-    NSF_code int PK, FK
+    nsf_code int PK, FK
   }
   COMPTEFORMATION_FORMA {
     id_compte_formation int PK, FK

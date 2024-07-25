@@ -1,20 +1,17 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-
-# useful for handling different item types with a single interface
+import dateparser
 from itemadapter import ItemAdapter
-from dateutil.parser import parse
 from dotenv import load_dotenv
 from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
-from .db.models import Formation, Session, Certification, NSF, Forma, Certificateur, formation_certification, certification_nsf, certification_forma, certification_certificateur
+from .db.models import Formation, Session, Certification, NSF, Forma, Certificateur, CompteFormation, formation_certification, certification_nsf, certification_forma, certification_certificateur
 from .db.session import get_session, choice_bdd
 from sqlalchemy.exc import IntegrityError
 from collections import deque
 import re
 import csv
+from sqlalchemy.orm import sessionmaker
+from scrapy.exceptions import DropItem
+from sqlalchemy import create_engine
+import os
 import dateparser
 
 
@@ -227,7 +224,15 @@ class SQLAlchemyPipeline(object):
     def __init__(self):
         # Charger la configuration de la base de données à partir de l'environnement
         load_dotenv()
-        self.bdd_path = choice_bdd()
+        if bool(int(os.getenv("IS_POSTGRES"))):
+            username = os.getenv("DB_USERNAME")
+            hostname = os.getenv("DB_HOSTNAME")
+            port = os.getenv("DB_PORT")
+            database_name = os.getenv("DB_NAME")
+            password = os.getenv("DB_PASSWORD")
+            self.bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+        else:
+            self.bdd_path = 'sqlite:///database.db'
         
         # Créer le moteur SQLAlchemy et initialiser la session
         self.SessionLocal = get_session(self.bdd_path)
@@ -339,6 +344,13 @@ class SQLAlchemyPipeline(object):
                 nsf_name=item.get("name")
             )
         self.session.add(nsf)
+        nsf = self.session.query(NSF).filter_by(nsf_code=item.get("code")).first()
+        if nsf is None:
+            nsf = NSF(
+                nsf_code=item.get("code"),
+                nsf_name=item.get("name")
+            )
+        self.session.add(nsf)
 
         certification = self.session.query(Certification).filter_by(id_certif=item.get("id_certif"), type_certif=item.get("type_certif")).first()
         if certification and nsf not in certification.nsfs:
@@ -376,3 +388,74 @@ class SQLAlchemyPipeline(object):
     def close_spider(self, spider):
         self.session.close()
 
+
+
+
+
+#######
+
+
+        # # 1) formation_certification
+        # 
+        # check_and_insert_association(
+        #     self.session,
+        #     formation_certification,
+        #     {
+        #         formation_certification.c.id_formation: formation.id_formation,
+        #         formation_certification.c.id_certif: id_certif,
+        #         formation_certification.c.type_certif: type_certif
+        #     },
+        #     {
+        #         'id_formation': formation.id_formation,
+        #         'id_certif': id_certif,
+        #         'type_certif': type_certif
+        #     }
+        # )
+
+        # # 2) certification_nsf
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_nsf,
+        #     {
+        #         certification_nsf.c.id_certif: item.get("id_certif"),
+        #         certification_nsf.c.type_certif: item.get("type_certif"),
+        #         certification_nsf.c.nsf_code: nsf.nsf_code
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'nsf_code': nsf.nsf_code
+        #     }
+        # )
+
+        # # 3) certification_forma
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_forma,
+        #     {
+        #         certification_forma.c.id_certif: item.get("id_certif"),
+        #         certification_forma.c.type_certif: item.get("type_certif"),
+        #         certification_forma.c.forma_code: forma_code
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'forma_code': forma_code
+        #     }
+        # )
+
+        # # 4) certification_certificateur
+        # check_and_insert_association(
+        #     self.session,
+        #     certification_certificateur,
+        #     {
+        #         certification_certificateur.c.id_certif: item.get("id_certif"),
+        #         certification_certificateur.c.type_certif: item.get("type_certif"),
+        #         certification_certificateur.c.siret: certificateur.siret
+        #     },
+        #     {
+        #         'id_certif': item.get("id_certif"),
+        #         'type_certif': item.get("type_certif"),
+        #         'siret': certificateur.siret
+        #     }
+        # )
