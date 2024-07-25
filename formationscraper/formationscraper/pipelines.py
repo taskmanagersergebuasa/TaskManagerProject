@@ -218,7 +218,7 @@ class SQLAlchemyPipeline(object):
             port = os.getenv("DB_PORT")
             database_name = os.getenv("DB_NAME")
             password = os.getenv("DB_PASSWORD")
-            self.bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+            self.bdd_path = f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{database_name}"
         else:
             self.bdd_path = 'sqlite:///database.db'
         
