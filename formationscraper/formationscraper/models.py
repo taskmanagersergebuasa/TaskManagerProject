@@ -12,7 +12,7 @@ if bool(int(os.getenv("IS_POSTGRES"))):
     port = os.getenv("DB_PORT")
     database_name = os.getenv("DB_NAME")
     password = os.getenv("DB_PASSWORD")
-    bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+    bdd_path = f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{database_name}"
 else:
     bdd_path = 'sqlite:///database.db'
 

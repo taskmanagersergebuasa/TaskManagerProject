@@ -1,3 +1,4 @@
+import dateparser
 from itemadapter import ItemAdapter
 from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
 import re
@@ -111,7 +112,7 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         id_certif = adapter.get('id_certif')
         if id_certif:           
-            adapter['id_certif'] = int(re.search(r'(RS|RNCP)(\d+)', id_certif).group(2))
+            adapter['id_certif'] = (re.search(r'(RS|RNCP)(\d+)', id_certif).group(2))
         return item
 
 
@@ -160,8 +161,10 @@ class FormationscraperPipeline:
         debut = adapter.get('date_debut')
         if debut :          
             debut = debut.strip().replace('Début : ','')
-            dt = parse(debut, fuzzy_with_tokens=True)[0]
-            adapter['date_debut'] = dt.strftime("%m/%Y")
+            dt = dateparser.parse(debut, date_formats=['%d %B %Y']  ,settings={'PREFER_DAY_OF_MONTH': 'first','DATE_ORDER': 'YMD'})
+            adapter['date_debut'] = dt
+            #dt = parse(debut, fuzzy_with_tokens=True)[0]
+            #adapter['date_debut'] = dt.strftime("%m/%Y")
         return item
     
 
@@ -218,7 +221,7 @@ class SQLAlchemyPipeline(object):
             port = os.getenv("DB_PORT")
             database_name = os.getenv("DB_NAME")
             password = os.getenv("DB_PASSWORD")
-            self.bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+            self.bdd_path = f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{database_name}"
         else:
             self.bdd_path = 'sqlite:///database.db'
         
@@ -230,20 +233,21 @@ class SQLAlchemyPipeline(object):
     def process_item(self, item, spider):
         try:
             if isinstance(item, FormationItem):
-                self.save_formation(item)
+                    self.save_formation(item)
             elif isinstance(item, SessionItem):
-                self.save_session(item)
+                    self.save_session(item)
             elif isinstance(item, RncpItem):
-                self.save_rncp(item)
+                    self.save_rncp(item)
             elif isinstance(item, RsItem):
-                self.save_rs(item)
+                    self.save_rs(item)
             elif isinstance(item, NsfItem):
-                self.save_nsf(item)
+                    self.save_nsf(item)
             elif isinstance(item, FormaItem):
-                self.save_forma(item)
+                    self.save_forma(item)
             elif isinstance(item,CertificateurItem):
-                self.save_certificateur(item)
+                    self.save_certificateur(item)
             self.session.commit()
+        
         except IntegrityError as e:
             self.session.rollback()
             spider.logger.error(f"Integrity error: {e}")
@@ -260,6 +264,7 @@ class SQLAlchemyPipeline(object):
         )
 
         self.session.add(formation)
+        
 
 
         # Associer la formation avec les certifications
@@ -279,6 +284,7 @@ class SQLAlchemyPipeline(object):
                 duree=item.get("duree")
             )
         self.session.add(session)
+        
 
     def save_rncp(self, item):
         rncp = self.session.query(Certification).filter_by(id_certif=item.get("id_certif"), type_certif=item.get("type_certif")).first()
