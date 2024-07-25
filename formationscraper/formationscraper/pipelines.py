@@ -1,3 +1,4 @@
+import dateparser
 from itemadapter import ItemAdapter
 from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
 import re
@@ -111,7 +112,7 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         id_certif = adapter.get('id_certif')
         if id_certif:           
-            adapter['id_certif'] = int(re.search(r'(RS|RNCP)(\d+)', id_certif).group(2))
+            adapter['id_certif'] = (re.search(r'(RS|RNCP)(\d+)', id_certif).group(2))
         return item
 
 
@@ -119,7 +120,8 @@ class FormationscraperPipeline:
         adapter = ItemAdapter(item)
         id_formation = adapter.get('id_formation')
         if id_formation:
-            match = re.search(r'(\d+)(?=/|$)', id_formation)
+            #match = re.search(r'(\d+)(?=/|$)', id_formation)
+            match = re.search(r'(\d+)/?$', id_formation)
             if match:
                 adapter['id_formation'] = int(match.group(1))
             else:
@@ -143,7 +145,7 @@ class FormationscraperPipeline:
     def clean_id_certif(self, item):
         adapter = ItemAdapter(item)
         id_certif = adapter.get('id_certif')
-        adapter['id_certif'] = list(set([int(re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2))
+        adapter['id_certif'] = list(set([re.search(r'recherche/(rs|rncp)/(\d+)', element).group(2)
         for element in id_certif if element and re.search(r'recherche/(rs|rncp)/(\d+)', element)]))
         return item
         
@@ -160,8 +162,10 @@ class FormationscraperPipeline:
         debut = adapter.get('date_debut')
         if debut :          
             debut = debut.strip().replace('Début : ','')
-            dt = parse(debut, fuzzy_with_tokens=True)[0]
-            adapter['date_debut'] = dt.strftime("%m/%Y")
+            dt = dateparser.parse(debut, date_formats=['%d %B %Y']  ,settings={'PREFER_DAY_OF_MONTH': 'first','DATE_ORDER': 'YMD'})
+            adapter['date_debut'] = dt
+            #dt = parse(debut, fuzzy_with_tokens=True)[0]
+            #adapter['date_debut'] = dt.strftime("%m/%Y")
         return item
     
 
@@ -230,20 +234,21 @@ class SQLAlchemyPipeline(object):
     def process_item(self, item, spider):
         try:
             if isinstance(item, FormationItem):
-                self.save_formation(item)
+                    self.save_formation(item)
             elif isinstance(item, SessionItem):
-                self.save_session(item)
+                    self.save_session(item)
             elif isinstance(item, RncpItem):
-                self.save_rncp(item)
+                    self.save_rncp(item)
             elif isinstance(item, RsItem):
-                self.save_rs(item)
+                    self.save_rs(item)
             elif isinstance(item, NsfItem):
-                self.save_nsf(item)
+                    self.save_nsf(item)
             elif isinstance(item, FormaItem):
-                self.save_forma(item)
+                    self.save_forma(item)
             elif isinstance(item,CertificateurItem):
-                self.save_certificateur(item)
+                    self.save_certificateur(item)
             self.session.commit()
+        
         except IntegrityError as e:
             self.session.rollback()
             spider.logger.error(f"Integrity error: {e}")
@@ -260,6 +265,7 @@ class SQLAlchemyPipeline(object):
         )
 
         self.session.add(formation)
+        
 
 
         # Associer la formation avec les certifications
@@ -279,6 +285,7 @@ class SQLAlchemyPipeline(object):
                 duree=item.get("duree")
             )
         self.session.add(session)
+        
 
     def save_rncp(self, item):
         rncp = self.session.query(Certification).filter_by(id_certif=item.get("id_certif"), type_certif=item.get("type_certif")).first()

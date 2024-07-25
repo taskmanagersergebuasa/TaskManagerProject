@@ -102,7 +102,7 @@ class Session(Base):
 
 class Certification(Base):
     __tablename__ = 'certification'
-    id_certif = Column(Integer, primary_key=True)
+    id_certif = Column(String, primary_key=True)
     type_certif = Column(String, primary_key=True)
     certif_name = Column(String)
     niveau = Column(Integer)
