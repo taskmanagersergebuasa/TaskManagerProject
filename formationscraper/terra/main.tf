@@ -3,13 +3,6 @@ resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
 }
 
-resource "azurerm_storage_account" "storage_account" {
-  name                     = var.storage_account_name
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
 
 resource "azurerm_postgresql_flexible_server" "postgresql" {
   name                = var.postgres_name
@@ -25,8 +18,6 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
   storage_tier                  = "P4"
   lifecycle {
     ignore_changes = [
-      # Ignore changes to tags, e.g. because a management agent
-      # updates these based on some ruleset managed elsewhere.
       zone,
     ]
   }
@@ -67,7 +58,7 @@ resource "azurerm_container_app_job" "container_job" {
   replica_retry_limit        = 0
   
   schedule_trigger_config{
-    cron_expression="*/10 * * * *"
+    cron_expression="*/40 * * * *"
   }
   template {
     
@@ -108,3 +99,5 @@ resource "azurerm_container_app_job" "container_job" {
   }
   
 }
+
+
