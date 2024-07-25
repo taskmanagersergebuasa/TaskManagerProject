@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import List, Optional 
-from ..db.session import get_datetype
+from typing import List, Optional
+from datetime import date
+# from ..db.session import get_datetype
 
 
 class Certification(BaseModel):
@@ -18,7 +19,7 @@ class Session(BaseModel):
     id_formation: int
     location: str
     duree: int
-    date_debut: str
+    date_debut: date
     
 
     class Config:
