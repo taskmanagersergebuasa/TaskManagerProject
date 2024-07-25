@@ -13,6 +13,8 @@ dateparser = "^1.2.0"
 psycopg2-binary = "^2.9.9"
 sqlalchemy = "^2.0.31"
 python-dotenv = "^1.0.1"
+pydantic-settings = "^2.3.4"
+numpy = "^2.0.1"
 
 
 [build-system]

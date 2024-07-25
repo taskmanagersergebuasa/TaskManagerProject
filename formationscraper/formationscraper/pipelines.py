@@ -2,7 +2,7 @@ import dateparser
 from itemadapter import ItemAdapter
 from dotenv import load_dotenv
 from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
-from .db.models import Formation, Session, Certification, NSF, Forma, Certificateur, formation_certification, certification_nsf, certification_forma, certification_certificateur
+from .db.models import Formation, Session, Certification, NSF, Forma, Certificateur, CompteFormation, formation_certification, certification_nsf, certification_forma, certification_certificateur
 from .db.session import get_session, choice_bdd
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select

@@ -9,7 +9,9 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 from dotenv import load_dotenv
 
-from formationscraper.formationscraper import models
+from ..db import models
+
+
 
 load_dotenv()
 
@@ -106,7 +108,7 @@ def load_clean_ex_rs():
     df_cf_test_rs = add_idcompteformation(df_cf_test_rs)
     #print(df_cf_test_rs.info())
     #print(df_cf_test_rs.index)
-    df_cf_test_rs.to_csv('compteformation/test_cf_rs')
+    df_cf_test_rs.to_csv('formationscraper/compteformation/test_cf_rs')
     print(df_cf_test_rs.info())
     return df_cf_test_rs
 #
@@ -144,25 +146,26 @@ def load_clean_compteformation():
     return df__cf_cleaned
     
 
-def load_clean_ex_rncp():
-    """_summary_
+""" def load_clean_ex_rncp():
+    _summary_
 
     Returns:
         _type_: _description_
-    """
+    
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
     df_cf_test_rncp = pd.read_json(URL_test_rncp).to_csv('compteformation/test_cf_rncp')
     return df_cf_test_rncp
 
 def load_clean_ex_rs():
-    """_summary_
+    _summary_
 
     Returns:
         _type_: _description_
-    """
+    
     #url = 'https://opendata.caissedesdepots.fr/api/explore/v2.1/catalog/datasets/moncompteformation_catalogueformation/exports/json?select=date_extract%2C%20nom_of%2C%20nom_departement%2C%20nom_region%2C%20type_referentiel%2C%20code_inventaire%2C%20code_rncp%2C%20intitule_certification%2C%20libelle_niveau_sortie_formation%2C%20code_formacode_1%2C%20code_formacode_2%2C%20code_formacode_3%2C%20code_formacode_4%2C%20code_formacode_5%2C%20libelle_code_formacode_principal%2C%20libelle_nsf_1%2C%20code_nsf_1%2C%20code_certifinfo%2C%20siret%2C%20numero_formation%2C%20intitule_formation%2C%20points_forts%2C%20nb_action%2C%20nb_session_active%2C%20nb_session_a_distance%2C%20nombre_heures_total_min%2C%20nombre_heures_total_max%2C%20nombre_heures_total_mean%2C%20frais_ttc_tot_min%2C%20frais_ttc_tot_max%2C%20frais_ttc_tot_mean%2C%20code_departement%2C%20code_region%2C%20nbaction_nbheures%2C%20coderegion_export&where=code_nsf_1%20%3D%20%22326%22&limit=100&timezone=UTC&use_labels=false&epsg=4326'
     df_cf_test_rs = pd.read_json(URL_test_rs).to_csv('compteformation/test_cf_rs')
-    return df_cf_test_rs
+    print(df_cf_test_rs.info())
+    return df_cf_test_rs """
 
 #load_compteformation()
 
@@ -223,7 +226,9 @@ def update_cf():
         with open('last_update_file.txt', 'a') as date_reader_file:
             last_update = get_current_date()
             date_reader_file.write(f"{last_update}")
-        return load_clean_ex_rs()
+        df_update = load_clean_ex_rs()
+        print(df_update.info())
+        return df_update
         
         
         #return load_clean_ex_rncp()
@@ -253,12 +258,12 @@ def processing_compteformation():
       #df_nfs OK
       df_nsf = pd.DataFrame()
       # concatenation verticale des codes nfs en NFS_code et suppression valeur nulles
-      df_nsf['NSF_code'] = pd.concat([df_source['code_nsf_1'], df_source['code_nsf_2'], df_source['code_nsf_3']])
-      se_code = df_nsf['NSF_code'].dropna()
+      df_nsf['nsf_code'] = pd.concat([df_source['code_nsf_1'], df_source['code_nsf_2'], df_source['code_nsf_3']])
+      se_code = df_nsf['nsf_code'].dropna()
       print(se_code.info())
       # concatenation verticale des libelles ou nfs name en NFS_name et suppression valeurs nulles
-      df_nsf['NSF_name'] = pd.concat([df_source['libelle_nsf_1'], df_source['libelle_nsf_2'], df_source['libelle_nsf_3']])  
-      se_name = df_nsf['NSF_name'].dropna()
+      df_nsf['nsf_name'] = pd.concat([df_source['libelle_nsf_1'], df_source['libelle_nsf_2'], df_source['libelle_nsf_3']])  
+      se_name = df_nsf['nsf_name'].dropna()
       print(se_name.info())            
       # concatenation de NFS_code et NFS_name
       df_nsf = pd.concat([se_code, se_name], axis=1)
@@ -291,7 +296,9 @@ def processing_compteformation():
       print(df_dict)
 
       #df_certification
-      ""
+      df_certification = pd.DataFrame()
+
+
 
 
       return df_dict
@@ -311,10 +318,10 @@ def ingest_tables(df_dict: dict):
       else:
             bdd_path = 'sqlite:///database.db'
 
-      #engine = create_engine(bdd_path)
+      engine = create_engine(bdd_path)
       #engine = create_engine('sqlite://', echo=False)
      
-      #models.Base = declarative_base()
+      models.Base = declarative_base()
       if engine.dialect.name == 'sqlite':
         date_type = String
       elif engine.dialect.name == 'postgresql':
@@ -329,8 +336,17 @@ def ingest_tables(df_dict: dict):
             print(isinstance(nom_table, str))
             if isinstance(df, pd.DataFrame) & isinstance(nom_table, str):
                   print("verif if")
-                  df.to_sql(nom_table, engine, if_exists="append", index=False)
-            
+                  df.to_sql(nom_table, con=engine, if_exists="append", index=False)
+
+                  # remplir une table temporaire
+                  #df.to_sql(name='table_temporaire', con=engine, if_exists="append", index=False)
+                  # instruction sql update
+                  #update_sql = f"""
+                  #UPDATE {nom_table}
+                  #SET 
+
+                  
+                  #execution instruction update
       
 
 
