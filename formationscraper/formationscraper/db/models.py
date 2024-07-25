@@ -1,37 +1,30 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Table, PrimaryKeyConstraint, ForeignKeyConstraint
-from sqlalchemy.orm import relationship
-from .session import Base, get_datetype
+from sqlalchemy import create_engine, Column, String, Integer, Float, Date, ForeignKey, Table, PrimaryKeyConstraint, ForeignKeyConstraint
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+import os
+from dotenv import load_dotenv
 
-date_type = get_datetype()
+load_dotenv()
 
-### j'ai basculé les éléments de la session dans /db/session.py
+if bool(int(os.getenv("IS_POSTGRES"))):
+    username = os.getenv("DB_USERNAME")
+    hostname = os.getenv("DB_HOSTNAME")
+    port = os.getenv("DB_PORT")
+    database_name = os.getenv("DB_NAME")
+    password = os.getenv("DB_PASSWORD")
+    bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
+else:
+    bdd_path = 'sqlite:///database.db'
 
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.orm import sessionmaker
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# if bool(int(os.getenv("IS_POSTGRES"))):
-#     username = os.getenv("DB_USERNAME")
-#     hostname = os.getenv("DB_HOSTNAME")
-#     port = os.getenv("DB_PORT")
-#     database_name = os.getenv("DB_NAME")
-#     password = os.getenv("DB_PASSWORD")
-#     bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
-# else:
-#     bdd_path = 'sqlite:///database.db'
-
-# engine = create_engine(bdd_path)
-# Base = declarative_base()
-# if engine.dialect.name == 'sqlite':
-#     date_type = String
-# elif engine.dialect.name == 'postgresql':
-#     date_type = Date
-# else:
-#     raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
-   
+engine = create_engine(bdd_path)
+Base = declarative_base()
+if engine.dialect.name == 'sqlite':
+    date_type = String
+elif engine.dialect.name == 'postgresql':
+    date_type = Date
+else:
+    raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
+    
 
 # Définir les tables d'association en premier
 certification_forma = Table(
@@ -150,3 +143,6 @@ class Forma(Base):
     certifications = relationship('Certification',
                               secondary=certification_forma,
                               back_populates='formas')
+
+engine = create_engine(bdd_path)
+Base.metadata.create_all(engine)
