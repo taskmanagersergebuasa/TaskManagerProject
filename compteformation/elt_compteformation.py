@@ -290,10 +290,10 @@ def ingest_tables(df_dict: dict):
       else:
             bdd_path = 'sqlite:///database.db'
 
-      engine = create_engine(bdd_path)
+      #engine = create_engine(bdd_path)
       #engine = create_engine('sqlite://', echo=False)
      
-      models.Base = declarative_base()
+      #models.Base = declarative_base()
       if engine.dialect.name == 'sqlite':
         date_type = String
       elif engine.dialect.name == 'postgresql':

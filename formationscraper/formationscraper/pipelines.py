@@ -6,6 +6,7 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+import dateparser
 from dateutil.parser import parse
 from dotenv import load_dotenv
 from .items import FormationItem, SessionItem, CertifItemBase, RncpItem, RsItem, NsfItem, FormaItem, CertificateurItem
@@ -163,8 +164,10 @@ class FormationscraperPipeline:
         debut = adapter.get('date_debut')
         if debut :          
             debut = debut.strip().replace('Début : ','')
-            dt = parse(debut, fuzzy_with_tokens=True)[0]
-            adapter['date_debut'] = dt.strftime("%m/%Y")
+            dt = dateparser.parse(debut, date_formats=['%d %B %Y']  ,settings={'PREFER_DAY_OF_MONTH': 'first','DATE_ORDER': 'YMD'})
+            adapter['date_debut'] = dt
+            #dt = parse(debut, fuzzy_with_tokens=True)[0]
+            #adapter['date_debut'] = dt.strftime("%m/%Y")
         return item
     
 
@@ -273,10 +276,11 @@ class SQLAlchemyPipeline(object):
             id_formation=item.get("id_formation")
         )
         try:
-            self.session.merge(formation)
-            self.session.commit()
+            self.session.add(formation)
+            #self.session.commit()
         except:
             self.session.rollback()
+        
 
         # Associer la formation avec les certifications
         for id_certif, type_certif in list(set(zip(item.get("id_certif"), item.get("type_certif")))):         
@@ -307,9 +311,9 @@ class SQLAlchemyPipeline(object):
             date_debut=item.get("date_debut"),
             duree=item.get("duree")
         )
-        self.session.merge(session)
-        self.session.commit()
-        
+        self.session.add(session)
+        #self.session.commit()
+                
 
     def save_rncp(self, item):
         rncp = Certification(
@@ -319,8 +323,8 @@ class SQLAlchemyPipeline(object):
             niveau=item.get("niveau"),
             etat=item.get("etat")
         )
-        self.session.merge(rncp)
-        self.session.commit()
+        self.session.add(rncp)
+        #self.session.commit()
         
 
     def save_rs(self, item):
@@ -330,8 +334,8 @@ class SQLAlchemyPipeline(object):
             certif_name=item.get("titre"),
             etat=item.get("etat")
         )
-        self.session.merge(rs)
-        self.session.commit()
+        self.session.add(rs)
+        #self.session.commit()
         
 
     def save_nsf(self, item):
@@ -339,8 +343,8 @@ class SQLAlchemyPipeline(object):
             nsf_code=item.get("code"),
             nsf_name=item.get("name")
         )
-        self.session.merge(nsf)
-        self.session.commit()
+        self.session.add(nsf)
+        #self.session.commit()
         
         existing_association = self.session.execute(
             select(certification_nsf)
@@ -366,8 +370,8 @@ class SQLAlchemyPipeline(object):
             forma_name=item.get("name")
         )
         
-        self.session.merge(forma)
-        self.session.commit()
+        self.session.add(forma)
+        #self.session.commit()
         
 
         existing_association = self.session.execute(
@@ -393,8 +397,8 @@ class SQLAlchemyPipeline(object):
             legal_name=item.get("certificateur_name")
         )
         
-        self.session.merge(certificateur)
-        self.session.commit()
+        self.session.add(certificateur)
+        #self.session.commit()
         
 
         existing_association = self.session.execute(
