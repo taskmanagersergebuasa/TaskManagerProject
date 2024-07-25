@@ -182,29 +182,3 @@ async def get_formation_par_formacode(
         raise HTTPException(status_code=404, detail="Certification non trouvée")
     
     return formations
-
-
-### Comparaison avec une autre table
-# @router.get("/compare/")
-# async def compare_formation_with_another_table(formation_id: int, db: Session = Depends(get_db)):
-#     formation = db.query(DBFormation).filter(DBFormation.id_formation == formation_id).first()
-#     if formation is None:
-#         raise HTTPException(status_code=404, detail="Formation non trouvée")
-
-#     # Comparaison avec une autre table
-#     results = db.query(AnotherModel).filter(
-#         AnotherModel.type_certif == formation.type_certif,
-#         AnotherModel.id_certif == formation.id_certif
-#     ).all()
-
-#     if not results:
-#         return {"message": "No matching records found in another table."}
-
-#     return results
-
-# @router.post("/scrape")
-# def scrape():
-#     process = CrawlerProcess(settings=scrapy_settings)
-#     process.crawl(formationspider)
-#     process.start()
-#     return {"status": "scraping started"}

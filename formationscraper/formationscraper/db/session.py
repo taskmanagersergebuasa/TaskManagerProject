@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from dotenv import load_dotenv
 from ..core.config import settings
 
