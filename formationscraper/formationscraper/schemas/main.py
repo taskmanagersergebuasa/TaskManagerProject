@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import List, Optional 
-from ..db.session import get_datetype
+from typing import List, Optional
+from datetime import date
+# from ..db.session import get_datetype
 
 
 class Certification(BaseModel):
@@ -13,26 +14,29 @@ class Certification(BaseModel):
     class Config:
         from_attributes = True
 
+class Session(BaseModel):
+    id_session: int
+    id_formation: int
+    location: str
+    duree: int
+    date_debut: date
+    
+
+    class Config:
+        from_attributes = True
+    
 class Formation(BaseModel):
     filiere: str
     id_formation: int
     titre_formation: str
     
     certifications: List[Certification]
+    sessions: List[Session]
 
     class Config:
         from_attributes = True
 
-class Session(BaseModel):
-    id_session: int
-    id_formation: int
-    location: str
-    duree: int
-    date_debut: get_datetype
-    duree: str
 
-    class Config:
-        from_attributes = True
 
 class Certificateur(BaseModel):
     siret: str

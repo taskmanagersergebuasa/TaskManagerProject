@@ -1,44 +1,16 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Table, PrimaryKeyConstraint, ForeignKeyConstraint
+from sqlalchemy import Column, String, Integer, ForeignKey, Table, PrimaryKeyConstraint, ForeignKeyConstraint, Date
 from sqlalchemy.orm import relationship
 from .session import Base, get_datetype
 
 date_type = get_datetype()
-
-### j'ai basculé les éléments de la session dans /db/session.py
-
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.orm import sessionmaker
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# if bool(int(os.getenv("IS_POSTGRES"))):
-#     username = os.getenv("DB_USERNAME")
-#     hostname = os.getenv("DB_HOSTNAME")
-#     port = os.getenv("DB_PORT")
-#     database_name = os.getenv("DB_NAME")
-#     password = os.getenv("DB_PASSWORD")
-#     bdd_path = f"postgresql://{username}:{password}@{hostname}:{port}/{database_name}"
-# else:
-#     bdd_path = 'sqlite:///database.db'
-
-# engine = create_engine(bdd_path)
-# Base = declarative_base()
-# if engine.dialect.name == 'sqlite':
-#     date_type = String
-# elif engine.dialect.name == 'postgresql':
-#     date_type = Date
-# else:
-#     raise ValueError(f"SGBD non pris en charge : {engine.dialect.name}")
-   
+ 
 
 # Définir les tables d'association en premier
 certification_forma = Table(
     'certification_forma',
     Base.metadata,
-    Column('id_certif'),
-    Column('type_certif'),
+    Column('id_certif', String),
+    Column('type_certif', String),
     Column('forma_code', ForeignKey('forma.forma_code')),
     PrimaryKeyConstraint('forma_code', 'id_certif', 'type_certif'),
     ForeignKeyConstraint(
@@ -50,8 +22,8 @@ certification_forma = Table(
 certification_nsf = Table(
     'certification_nsf',
     Base.metadata,
-    Column('id_certif'),
-    Column('type_certif'),
+    Column('id_certif', String),
+    Column('type_certif', String),
     Column('nsf_code', ForeignKey('nsf.nsf_code')),
     PrimaryKeyConstraint('nsf_code', 'id_certif', 'type_certif'),
     ForeignKeyConstraint(
@@ -64,8 +36,8 @@ formation_certification = Table(
     'formation_certification',
     Base.metadata,
     Column('id_formation', ForeignKey('formation.id_formation')),
-    Column('id_certif'),
-    Column('type_certif'),
+    Column('id_certif', String),
+    Column('type_certif', String),
     PrimaryKeyConstraint('id_formation', 'id_certif', 'type_certif'),
     ForeignKeyConstraint(
         ['id_certif', 'type_certif'],
@@ -76,8 +48,8 @@ formation_certification = Table(
 certification_certificateur = Table(
     'certification_certificateur',
     Base.metadata,
-    Column('id_certif'),
-    Column('type_certif'),
+    Column('id_certif', String),
+    Column('type_certif', String),
     Column('siret', ForeignKey('certificateur.siret')),
     PrimaryKeyConstraint('id_certif', 'type_certif', 'siret'),
     ForeignKeyConstraint(
@@ -104,7 +76,7 @@ class Session(Base):
     id_formation = Column(Integer, ForeignKey('formation.id_formation')) 
     location = Column(String)
     duree = Column(Integer)
-    date_debut = Column(date_type)
+    date_debut = Column(Date) # date_type
     formation = relationship("Formation", back_populates="sessions")
 
 class Certification(Base):
@@ -150,3 +122,4 @@ class Forma(Base):
     certifications = relationship('Certification',
                               secondary=certification_forma,
                               back_populates='formas')
+    
