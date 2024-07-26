@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Introduction - Template for ML API</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Introduction";
+        var mkdocs_page_input_path = "scraping/introduction.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Template for ML API
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Accueil</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" >API</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/introduction/">Introduction</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Scraping</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Introduction</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#i-creer-la-documentation">I Créer la documentation</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1-installer-les-librairies-pythons-mkdocs-mkdocstrings-et-mkdocstrings-python">1. Installer les librairies pythons mkdocs, mkdocstrings et mkdocstrings-python</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2-creer-un-fichier-mkdocsyml-a-la-racine-du-projet-pour-configurer-la-doc">2. Créer un fichier mkdocs.yml à la racine du projet pour configurer la doc</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3-creer-le-dossier-docs-et-ajouter-toutes-les-docs">3. Créer le dossier docs et ajouter toutes les docs</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#4-on-peut-inclure-directement-les-docstings-comme-cela">4. On peut inclure directement les docstings comme cela</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#5-pour-ajouter-des-fichiers-md-en-dehors-du-repertoire-docs-il-faut-creer-des-liens-symboliques-dans-docs">5. Pour ajouter des fichiers md en dehors du répertoire docs, il faut créer des liens symboliques dans docs:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ii-publier-la-documentation-sur-github-pages">II Publier la documentation sur github pages</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1-en-local-creer-la-branche-qui-va-accueillir-la-doc-le-html-et-css-generes-automatiquement-notamment">1. En local créer la branche qui va accueillir la doc (le html et css générés automatiquement notamment)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2-configurer-github-pages">2. Configurer GitHub Pages</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3-construisez-votre-doc-et-deployer-votre-code-sur-la-branch">3. Construisez votre doc et déployer votre code sur la branch:</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../models/">Models</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Template for ML API</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Documentation</li>
+          <li class="breadcrumb-item">Scraping</li>
+      <li class="breadcrumb-item active">Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="utilisation-de-mkdocs">Utilisation de mkdocs</h1>
+<h2 id="i-creer-la-documentation">I Créer la documentation</h2>
+<h3 id="1-installer-les-librairies-pythons-mkdocs-mkdocstrings-et-mkdocstrings-python">1. Installer les librairies pythons mkdocs, mkdocstrings et mkdocstrings-python</h3>
+<h3 id="2-creer-un-fichier-mkdocsyml-a-la-racine-du-projet-pour-configurer-la-doc">2. Créer un fichier mkdocs.yml à la racine du projet pour configurer la doc</h3>
+<pre><code class="language-yml">site_name: &quot;Nom de votre projet&quot;
+nav: # on définit l'architecture de la doc en faisant les liens vers les fichiers dans docs
+  - Accueil: index.md
+  - Documentation:
+      - Introduction: introduction.md
+      - API:
+          - Module1: api/module1.md
+          - Module2: api/module2.md
+theme:
+  name: readthedocs #on peut utiliser d'autre theme de doc
+
+plugins:
+  - search
+  - mkdocstrings: #ce la permet d'intégrer directement les docstrings
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            rendering:
+              show_source: true
+</code></pre>
+<h3 id="3-creer-le-dossier-docs-et-ajouter-toutes-les-docs">3. Créer le dossier docs et ajouter toutes les docs</h3>
+<h3 id="4-on-peut-inclure-directement-les-docstings-comme-cela">4. On peut inclure directement les docstings comme cela</h3>
+<pre><code class="language-md"># Documentation du Module1
+
+::: src.module1
+    handler: python
+    rendering:
+      show_source: true
+</code></pre>
+<h3 id="5-pour-ajouter-des-fichiers-md-en-dehors-du-repertoire-docs-il-faut-creer-des-liens-symboliques-dans-docs">5. Pour ajouter des fichiers md en dehors du répertoire docs, il faut créer des liens symboliques dans docs:</h3>
+<h4 id="creation-des-liens-symboliques">Création des liens symboliques :</h4>
+<p>Supposons que vous ayez un fichier Markdown situé dans ../external_docs/intro.md que vous voulez inclure dans la documentation. Créez un lien symbolique dans le répertoire docs :</p>
+<pre><code class="language-bash">ln -s ../external_docs/intro.md docs/intro.md
+</code></pre>
+<p>Cette commande crée un lien symbolique nommé intro.md dans le répertoire docs pointant vers ../external_docs/intro.md.</p>
+<h2 id="ii-publier-la-documentation-sur-github-pages">II Publier la documentation sur github pages</h2>
+<h3 id="1-en-local-creer-la-branche-qui-va-accueillir-la-doc-le-html-et-css-generes-automatiquement-notamment">1. En local créer la branche qui va accueillir la doc (le html et css générés automatiquement notamment)</h3>
+<p><code>bash
+git branch -M gh-pages
+git push -f origin gh-pages</code></p>
+<h3 id="2-configurer-github-pages">2. Configurer GitHub Pages</h3>
+<ul>
+<li>Accédez à votre dépôt sur GitHub.</li>
+<li>Allez dans "Settings".</li>
+<li>Dans la section "Pages", sélectionnez la branche gh-pages comme source et roots Cliquez sur "Save".</li>
+</ul>
+<h3 id="3-construisez-votre-doc-et-deployer-votre-code-sur-la-branch">3. Construisez votre doc et déployer votre code sur la branch:</h3>
+<p><code>bash
+ mkdocs build    
+ mkdocs gh-deploy --force</code></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../api/introduction/" class="btn btn-neutral float-left" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../models/" class="btn btn-neutral float-right" title="Models">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../api/introduction/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../models/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
